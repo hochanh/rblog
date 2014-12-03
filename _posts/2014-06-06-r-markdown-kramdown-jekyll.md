@@ -47,6 +47,6 @@ Ban đầu thuộc tính `published:` của bài đăng R Markdown là `true`, s
  
 - Cuối cùng là `add`, `commit` và `push` lên GitHub.
  
-Xem mã nguồn blog này [tại đây](http://github.com/vomanhtai/blog).
+Xem mã nguồn blog này [tại đây](http://github.com/vomanhtai/vomanhtai.github.io).
  
 [^1]: <http://jason.bryer.org/posts/2012-12-10/Markdown_Jekyll_R_for_Blogging.html>

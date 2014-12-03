@@ -17,6 +17,14 @@ lapply(libs, require, character.only = TRUE)
 
 
 {% highlight text %}
+## Loading required package: ggplot2
+## Loading required package: HistData
+## Loading required package: scales
+{% endhighlight %}
+
+
+
+{% highlight text %}
 ## [[1]]
 ## [1] TRUE
 ## 
@@ -35,14 +43,14 @@ lapply(libs, require, character.only = TRUE)
                 group = group)))
 {% endhighlight %}
 
-![plot of chunk minard](../../figures/napoleon-march-in-r/minard-1.png) 
+![plot of chunk minard](../figures/napoleon-march-in-r/minard-1.png) 
 
 {% highlight r %}
 (plot_both <- plot_troops +
   geom_text(aes(label = city), size = 4, data = Minard.cities))
 {% endhighlight %}
 
-![plot of chunk minard](../../figures/napoleon-march-in-r/minard-2.png) 
+![plot of chunk minard](../figures/napoleon-march-in-r/minard-2.png) 
 
 {% highlight r %}
 (plot_polished <- plot_both +
@@ -54,6 +62,6 @@ lapply(libs, require, character.only = TRUE)
   ylab(NULL))
 {% endhighlight %}
 
-![plot of chunk minard](../../figures/napoleon-march-in-r/minard-3.png) 
+![plot of chunk minard](../figures/napoleon-march-in-r/minard-3.png) 
   
 Xem bản đồ đầy đủ trên [Wikipedia](http://en.wikipedia.org/wiki/File:Minard.png).

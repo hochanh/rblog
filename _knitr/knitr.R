@@ -1,4 +1,4 @@
-jekyll_it <- function(dir=getwd(), images.dir=dir, images.url='../',
+jekyll_it <- function(dir=getwd(), images.dir=dir, images.url='',
                       out_ext='.md', in_ext='.rmd', recursive=FALSE) {
   require(knitr, quietly=TRUE, warn.conflicts=TRUE)
   # Scan folder for .Rmd files

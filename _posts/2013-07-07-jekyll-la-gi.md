@@ -9,4 +9,4 @@ Bạn có thể tìm hiểu thêm tại [trang chủ dự án Jekyll](https://gi
 
 Trang web này được tạo trên nền tảng Jekyll sử dụng mẫu Hyde, lưu trữ tại GitHub.
 
-Xem [mã nguồn](http://github.com/vomanhtai/blog).
+Xem [mã nguồn](http://github.com/vomanhtai/vomanhtai.github.io).
