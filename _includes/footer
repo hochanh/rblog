@@ -19,7 +19,7 @@
 {% endif %}
 
 {% if page.converted %}
-	<a href="{{ page.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/vomanhtai/blog/gh-pages/_knitr/" }}" title="Rmd file" target="_blank"><svg height="24" width="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 1024">
+	<a href="{{ page.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/vomanhtai/vomanhtai.github.io/master/_knitr/" }}" title="Rmd file" target="_blank"><svg height="24" width="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 1024">
 		<path d="M288 384L128 544l160 160 64-64-96-96 96-96L288 384zM416 448l96 96-96 96 64 64 160-160L480 384 416 448zM576 64H0v896h768V256L576 64zM704 896H64V128h448l192 192V896z" />Rmd file
 	</svg></a>
 {% endif %}

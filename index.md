@@ -9,7 +9,7 @@ layout: default
 <p>&raquo; 
 <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
 {% if post.converted %}
-<span style="float: right"><a href="{{ post.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/vomanhtai.github.io/blog/master/_knitr/" }}" title="Rmd file" target="_blank">[code]</a>
+<span style="float: right"><a href="{{ post.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/vomanhtai/vomanhtai.github.io/master/_knitr/" }}" title="Rmd file" target="_blank">[code]</a>
 </span>
 {% endif %}
 </p>
