@@ -1,0 +1,19 @@
+title: Mạnh Tài
+author: Mạnh Tài
+url: http://xn--mnhti-uqa9244c.vn
+description: "Thống kê, R và những thứ khác."
+
+permalink: /:title/
+highlighter: pygments
+markdown: kramdown
+kramdown:
+  input: GFM
+
+exclude:
+ - README.md
+ - CNAME
+ 
+gems:
+- jekyll-redirect-from
+- jekyll-sitemap
+- jemoji

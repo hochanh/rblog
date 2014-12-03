@@ -1,0 +1,225 @@
+---
+layout: post
+title: "ISL: Chapter 6"
+published: yes
+---
+
+## Bài 8
+
+```{r SubsetSelection}
+set.seed(123)
+x=rnorm(100,mean=10)
+set.seed(124)
+ep=rnorm(100)
+
+y=1+2*x+3*x^2+4*x^3+ep
+
+plot(x,y)
+
+xy=data.frame(x,y)
+library(leaps)
+reg.full=regsubsets(y~poly(x,10),data=xy,nvmax=10)
+reg.sum=summary(reg.full)
+
+par(mfrow=c(2,2))
+par(mar=rep(4,4))
+
+plot(reg.sum$rss,xlab="Number of Variables",ylab="RSS",type="l")
+
+plot(reg.sum$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+m=which.max(reg.sum$adjr2)
+points(m,reg.sum$adjr2[m], col="red",cex=2,pch=20)
+
+plot(reg.sum$cp,xlab="Number of Variables",ylab="Cp",type='l')
+m=which.min(reg.sum$cp)
+points(m,reg.sum$cp[m], col="red",cex=2,pch=20)
+
+plot(reg.sum$bic,xlab="Number of Variables",ylab="BIC",type='l')
+m=which.min(reg.sum$bic)
+points(m,reg.sum$bic[m], col="red",cex=2,pch=20)
+
+par(mfrow=c(1,1))
+plot(reg.full,scale="r2")
+plot(reg.full,scale="adjr2")
+plot(reg.full,scale="Cp")
+plot(reg.full,scale="bic")
+
+coef(reg.full,3)
+
+# Code lines below are wrong in term of using here
+# but the syntax is correct,
+# so I keep it here for latter uses.
+
+# z=sapply(x,function(z) coef(reg.full,3)*c(1,z,z^2,z^3))
+# plot(x,apply(z,2,sum),col="red")
+# lines(x,y,col="green")
+```
+
+
+```{r ForwardSelection}
+reg.fwd=regsubsets(y~poly(x,10),data=xy,nvmax=10,method="forward")
+reg.sum=summary(reg.fwd)
+
+par(mfrow=c(2,2))
+par(mar=rep(4,4))
+
+plot(reg.sum$rss,xlab="Number of Variables",ylab="RSS",type="l")
+
+plot(reg.sum$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+m=which.max(reg.sum$adjr2)
+points(m,reg.sum$adjr2[m], col="red",cex=2,pch=20)
+
+plot(reg.sum$cp,xlab="Number of Variables",ylab="Cp",type='l')
+m=which.min(reg.sum$cp)
+points(m,reg.sum$cp[m], col="red",cex=2,pch=20)
+
+plot(reg.sum$bic,xlab="Number of Variables",ylab="BIC",type='l')
+m=which.min(reg.sum$bic)
+points(m,reg.sum$bic[m], col="red",cex=2,pch=20)
+
+coef(reg.fwd,3)
+```
+
+```{r BackwardSelection}
+reg.bwd=regsubsets(y~poly(x,10),data=xy,nvmax=10,method="backward")
+reg.sum=summary(reg.bwd)
+
+plot(reg.sum$rss,xlab="Number of Variables",ylab="RSS",type="l")
+
+plot(reg.sum$adjr2,xlab="Number of Variables",ylab="Adjusted RSq",type="l")
+m=which.max(reg.sum$adjr2)
+points(m,reg.sum$adjr2[m], col="red",cex=2,pch=20)
+
+plot(reg.sum$cp,xlab="Number of Variables",ylab="Cp",type='l')
+m=which.min(reg.sum$cp)
+points(m,reg.sum$cp[m], col="red",cex=2,pch=20)
+
+plot(reg.sum$bic,xlab="Number of Variables",ylab="BIC",type='l')
+m=which.min(reg.sum$bic)
+points(m,reg.sum$bic[m], col="red",cex=2,pch=20)
+
+coef(reg.bwd,3)
+```
+
+```{r TheLasso}
+library(glmnet)
+set.seed(123)
+train=sample(c(TRUE,FALSE), 100, replace=T)
+test=!train
+
+xm=model.matrix(y~poly(x,10))[,-1]
+y.test=y[test]
+
+grid=10^seq(10,-2,length=100)
+
+# RIDGE for compare
+ridge.mod=glmnet(xm[train,],y[train],alpha=0,lambda=grid, thresh=1e-13)
+# lambda=1 MSE (arbitrarily lamda)
+ridge.pred=predict(ridge.mod,s=1,newx=xm[test,])
+mean((ridge.pred-y.test)^2)
+
+# C-V ridge MSE
+set.seed(123)
+cv.out=cv.glmnet(xm[train,],y[train],alpha=0)
+bestlam=cv.out$lambda.min
+ridge.pred=predict(ridge.mod,s=bestlam,newx=xm[test,])
+mean((ridge.pred-y.test)^2)
+
+# vs. lm() function
+# What's wrong here?
+lm(y~xm,subset=train)
+predict(ridge.mod,s=0,exact=T,type="coefficients")[1:11,]
+# linear again
+ridge.pred=predict(ridge.mod,s=0,newx=xm[test,],exact=T)
+summary(ridge.pred)
+mean((ridge.pred-y.test)^2)
+
+# LASSO
+lasso.mod=glmnet(xm[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
+# C-V lasso MSE
+set.seed(123)
+cv.out=cv.glmnet(xm[train,],y[train],alpha=1)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+lasso.pred=predict(lasso.mod,s=bestlam,newx=xm[test,])
+mean((lasso.pred-y.test)^2)
+
+out=glmnet(xm,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:11,]
+lasso.coef
+lasso.coef[lasso.coef!=0]
+```
+
+
+## Bài 9
+
+```{r Collge}
+college=read.csv("./ISL/College.csv")
+
+# Extremely notice for row name of data
+rownames(college)=college[,1]
+college=college[,-1]
+
+set.seed(234)
+train=sample(c(TRUE,FALSE),nrow(college),replace=TRUE)
+test=!train
+x=model.matrix(Apps~.,data=college)[,-1]
+y=college$Apps
+y.test=y[test]
+
+# Linear regression
+reg.lm=lm(Apps~.,data=college,subset=train)
+pred.lm=predict(reg.lm,college[test,])
+mean((pred.lm-y.test)^2)
+
+# Ridge regression
+library(glmnet)
+grid=10^seq(10,-2,length=100)
+ridge.mod=glmnet(x[train,],y[train],alpha=0,lambda=grid, thresh=1e-12)
+set.seed(123)
+cv.out=cv.glmnet(x[train,],y[train],alpha=0)
+bestlam=cv.out$lambda.min
+ridge.pred=predict(ridge.mod,s=bestlam,newx=x[test,])
+mean((ridge.pred-y.test)^2)
+
+out=glmnet(x,y,alpha=0)
+predict(out,type="coefficients",s=bestlam)[1:17,]
+
+# Lasso model
+lasso.mod=glmnet(x[train,],y[train],alpha=1,lambda=grid)
+plot(lasso.mod)
+set.seed(456)
+cv.out=cv.glmnet(x[train,],y[train],alpha=1)
+plot(cv.out)
+bestlam=cv.out$lambda.min
+lasso.pred=predict(lasso.mod,s=bestlam,newx=x[test,])
+mean((lasso.pred-y.test)^2)
+
+out=glmnet(x,y,alpha=1,lambda=grid)
+lasso.coef=predict(out,type="coefficients",s=bestlam)[1:17,]
+lasso.coef
+lasso.coef[lasso.coef!=0]
+
+# PCR model
+library(pls)
+set.seed(789)
+pcr.fit=pcr(Apps~., data=College,subset=train,scale=TRUE,validation="CV")
+validationplot(pcr.fit,val.type="MSEP")
+pcr.pred=predict(pcr.fit,x[test,],ncomp=5)
+mean((pcr.pred-y.test)^2)
+
+pcr.fit=pcr(y~x,scale=TRUE,ncomp=5)
+summary(pcr.fit)
+
+# PLS model
+set.seed(101112)
+pls.fit=plsr(Apps~.,data=College,subset=train,scale=TRUE,validation="CV")
+summary(pls.fit)
+validationplot(pls.fit,val.type="MSEP")
+pls.pred=predict(pls.fit,x[test,],ncomp=5)
+mean((pls.pred-y.test)^2)
+pls.fit=plsr(Apps~.,data=College,scale=TRUE,ncomp=5)
+summary(pls.fit)
+```
+

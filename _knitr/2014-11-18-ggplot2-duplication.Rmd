@@ -1,0 +1,84 @@
+---
+layout: post
+title: "ggplot2: Duplication"
+published: yes
+---
+
+## Dùng phép lặp `last_plot()`
+
+```{r iteration}
+library(ggplot2)
+options(digits = 2)
+
+# Dùng last_plot() để phóng to đoạn quan tâm
+qplot(x, y, data = diamonds, na.rm = TRUE)
+last_plot() + xlim(3, 11) + ylim(3, 11)
+last_plot() + xlim(4, 10) + ylim(4, 10)
+last_plot() + xlim(4, 5) + ylim(4, 5)
+last_plot() + xlim(4, 4.5) + ylim(4, 4.5)
+last_plot() + geom_abline(colour = "red")
+
+# Lệnh tổng hợp cuối cùng
+qplot(x, y, data = diamonds, na.rm = T) + 
+  geom_abline(colour = "red") +
+  xlim(4, 4.5) + ylim(4, 4.5)
+```
+
+## Lưu mẫu biểu đồ
+
+### Lưu các đối tượng đơn
+
+```{r single}
+gradient_rb <- scale_colour_gradient(low = "red", high = "blue")
+qplot(cty, hwy, data = mpg, colour = displ) + gradient_rb
+qplot(bodywt, brainwt, data = msleep, colour = awake, log="xy") +
+  gradient_rb
+```
+
+### Lưu danh sách đối tượng
+
+```{r list}
+xquiet <- scale_x_continuous("", breaks = NULL)
+yquiet <- scale_y_continuous("", breaks = NULL)
+quiet <- list(xquiet, yquiet)
+
+qplot(mpg, wt, data = mtcars) + quiet
+qplot(displ, cty, data = mpg) + quiet
+```
+
+### Dùng hàm đổi đối số mặc định của hàm
+
+```{r func}
+geom_lm <- function(formula = y ~ x) {
+  geom_smooth(formula = formula, se = FALSE, method = "lm")
+}
+qplot(mpg, wt, data = mtcars) + geom_lm()
+library(splines)
+qplot(mpg, wt, data = mtcars) + geom_lm(y ~ ns(x, 3))
+```
+
+## Lưu hàm biểu đồ
+
+```{r plot functions}
+pcp_data <- function(df) {
+  libs <- c("plyr","reshape2")
+  lapply(libs, require, character.only = TRUE)
+  numeric <- laply(df, is.numeric)
+  # Rescale numeric columns
+  range01 <- function(x) x / range(x)
+  df[numeric] <- colwise(range01)(df[numeric])
+  # Add row identified
+  df$.row <- rownames(df)
+  # Melt, using non-numeric variables as id vars
+  dfm <- melt(df, id = c(".row", names(df)[!numeric]))
+  # Add pcp to class of the data frame
+  class(dfm) <- c("pcp", class(dfm))
+  dfm
+}
+pcp <- function(df, ...) {
+  df <- pcp_data(df)
+  ggplot(df, aes(variable, value)) + geom_line(aes(group = .row))
+}
+pcp(mpg)
+pcp(mpg) + aes(colour = drv)
+```

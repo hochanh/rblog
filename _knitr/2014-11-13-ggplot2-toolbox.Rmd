@@ -1,0 +1,358 @@
+---
+layout: post
+title: "ggplot2: Toolbox"
+published: yes
+---
+
+## Các loại biểu đồ cơ bản
+
+```{r 7 geom_xxx}
+library(ggplot2)
+df <- data.frame(
+  x = c(3, 1, 5), 
+  y = c(2, 4, 6), 
+  label = c("a","b","c")
+)
+p <- ggplot(df, aes(x, y, label = label)) + 
+  xlab(NULL) + ylab(NULL)
+p + geom_point() + labs(title = "geom_point")
+p + geom_bar(stat="identity") + 
+  labs(title = "geom_bar(stat=\"identity\")")
+p + geom_line() + labs(title = "geom_line")
+p + geom_area() + labs(title = "geom_area")
+p + geom_path() + labs(title = "geom_path")
+p + geom_text() + labs(title = "geom_text")
+p + geom_tile() + labs(title = "geom_tile")
+p + geom_polygon() + labs(title = "geom_polygon")
+```
+
+## Các phân phối xác suất
+
+### Sử dụng histogram
+
+```{r histo}
+# Mặc định:
+qplot(depth, data=diamonds, geom="histogram")
+# Phóng to đoạn (55, 70), tăng mức chi tiết xuống 0.1:
+qplot(depth, data=diamonds, geom="histogram", xlim=c(55, 70), binwidth=0.1)
+```
+
+### So sánh phân phối giữa các nhóm
+
+```{r compare dist}
+depth_dist <- ggplot(diamonds, aes(depth)) + xlim(58, 68)
+
+# Tạo nhiều histogram
+depth_dist + 
+  geom_histogram(aes(y = ..density..), binwidth = 0.1) +
+  facet_grid(cut ~ .)
+
+# Sử dụng đồ thị mật độ có điều kiện
+depth_dist + geom_histogram(aes(fill = cut), binwidth = 0.1, 
+  position = "fill")
+
+# Sử dụng các đường tần suất
+depth_dist + geom_freqpoly(aes(y = ..density.., colour = cut), 
+  binwidth = 0.1) 
+```
+
+### Phân phối liên tục có điều kiện
+
+```{r boxplot}
+# conditional on a discrete variable: `cut`
+qplot(cut, depth, data=diamonds, geom="boxplot")
+
+# conditional on a continuous variable: `carat`
+library(plyr)
+qplot(carat, depth, data=diamonds, geom="boxplot", 
+  group = round_any(carat, 0.1, floor), xlim = c(0, 3))
+```
+
+### Thêm độ nhiễu (jitter) vào phân phối
+
+```{r jitter}
+# Phân phối liên tục
+qplot(class, cty, data=mpg, geom="jitter")
+
+# Phân phối rời rạc
+qplot(class, drv, data=mpg, geom="jitter")
+```
+
+### Đường mật độ
+
+```{r density}
+qplot(depth, data=diamonds, geom="density", xlim = c(54, 70))
+qplot(depth, data=diamonds, geom="density", xlim = c(54, 70), 
+  fill = cut, alpha = I(0.2))
+```
+
+## Biểu diễn các điểm trùng lặp
+
+### Làm nhỏ các điểm biểu diễn
+
+```{r make smaller}
+df <- data.frame(x = rnorm(2000), y = rnorm(2000))
+norm <- ggplot(df, aes(x, y))
+norm + geom_point()
+norm + geom_point(shape = 1)
+norm + geom_point(shape = ".") # Pixel sized
+```
+
+### Làm mờ các điểm biểu diễn
+
+```{r make transparency}
+library(scales)
+norm + geom_point(colour = alpha("black", 1/3))
+norm + geom_point(colour = alpha("black", 1/5))
+norm + geom_point(colour = alpha("black", 1/10))
+```
+
+### Làm nhiễu
+
+```{r make jitter}
+td <- ggplot(diamonds, aes(table, depth)) + 
+  xlim(50, 70) + ylim(50, 70)
+# geom point
+td + geom_point()
+# geo jitter mặc định
+td + geom_jitter()
+# geo jitter theo phương ngang
+jit <- position_jitter(width = 0.5)
+td + geom_jitter(position = jit)
+td + geom_jitter(position = jit, colour = alpha("black", 1/10))
+td + geom_jitter(position = jit, colour = alpha("black", 1/50))
+td + geom_jitter(position = jit, colour = alpha("black", 1/200))  
+```
+
+### Phân nhóm
+
+```{r bin}
+d <- ggplot(diamonds, aes(carat, price)) + xlim(1,3) +
+  labs(legend.position = "none")
+d + stat_bin2d()
+d + stat_bin2d(bins = 10)
+d + stat_bin2d(binwidth=c(0.02, 200))
+d + stat_binhex()
+d + stat_binhex(bins = 10)
+d + stat_binhex(binwidth=c(0.02, 200))
+```
+
+### Sử dụng các đường đồng mức mật độ
+
+```{r overlay contours}
+d <- ggplot(diamonds, aes(carat, price)) + xlim(1,3) + 
+  labs(legend.position = "none")
+
+d + geom_point() + geom_density2d()
+d + stat_density2d(geom = "point", aes(size = ..density..), 
+ contour = F) + scale_size_area(0.2, 1.5)
+
+d + stat_density2d(geom = "tile", aes(fill = ..density..), 
+  contour = F)
+last_plot() + scale_fill_gradient(limits = c(1e-5,8e-4))
+```
+
+### Vẽ bản đồ
+
+Gói `maps` Chỉ mới hỗ trợ bản đồ Pháp, Ý, Tân Tây Lan,  Mỹ và bản đồ thế giới.
+
+```{r maps}
+library(maps)
+# Chú thích bằng điểm
+data(us.cities)
+big_cities <- subset(us.cities, pop > 500000)
+qplot(long, lat, data = big_cities) + borders("state", size = 0.5)
+
+tx_cities <- subset(us.cities, country.etc == "TX")
+ggplot(tx_cities, aes(long, lat)) +
+  borders("county", "texas", colour = "grey70") +
+  geom_point(colour = alpha("black", 0.5))
+
+# Tô màu bản đồ
+states <- map_data("state")
+arrests <- USArrests
+names(arrests) <- tolower(names(arrests))
+arrests$region <- tolower(rownames(USArrests))
+
+choro <- merge(states, arrests, by = "region")
+# Reorder the rows because order matters when drawing polygons
+# and merge destroys the original ordering
+choro <- choro[order(choro$order), ]
+qplot(long, lat, data = choro, group = group, 
+  fill = assault, geom = "polygon")
+qplot(long, lat, data = choro, group = group, 
+  fill = assault / murder, geom = "polygon")
+
+# Vài tùy chọn khác
+ia <- map_data("county", "iowa")
+mid_range <- function(x) mean(range(x, na.rm = TRUE))
+centres <- ddply(ia, .(subregion), 
+  colwise(mid_range, .(lat, long)))
+ggplot(ia, aes(long, lat)) + 
+  geom_polygon(aes(group = group), 
+    fill = NA, colour = "grey60") +
+  geom_text(aes(label = subregion), data = centres, 
+    size = 2, angle = 45)
+```
+
+## Độ bất định
+
+```{r uncertainly}
+d <- subset(diamonds, carat < 2.5 & 
+  rbinom(nrow(diamonds), 1, 0.2) == 1)
+# carat và price sau khi log10 sẽ có quan hệ tuyến tính
+d$lcarat <- log10(d$carat)
+d$lprice <- log10(d$price)
+
+# Loại bỏ quan hệ tuyến tính bằng cách sử dụng 
+# giá trị residual trong mô hình tuyến tính
+# làm biến dự báo mới
+detrend <- lm(lprice ~ lcarat, data = d)
+d$lprice2 <- resid(detrend)
+
+# Nhớ lcarat * color <=> lcarat + color + lcarat:color
+# lcarat:color là interaction term giữa lcarat và color.
+# Chạy mô hình với biến dự báo mới để xem xét độ bất định
+# trong mô hình cũ là do nhân tố nào gây ra.
+mod <- lm(lprice2 ~ lcarat * color, data = d)
+
+library(effects)
+effectdf <- function(...) {
+  suppressWarnings(as.data.frame(effect(...)))
+}
+color <- effectdf("color", mod)
+both1 <- effectdf("lcarat:color", mod)
+
+carat <- effectdf("lcarat", mod, default.levels = 50)
+both2 <- effectdf("lcarat:color", mod, default.levels = 3)
+
+# Đồ thị tuyến tính
+qplot(lcarat, lprice, data=d, colour = color)
+
+# Đồ thị sau khi loại bỏ quan hệ tuyến tính,
+# đây chính là đồ thị biểu diễn độ bất định
+qplot(lcarat, lprice2, data=d, colour = color)
+
+# Khởi tạo đồ thị biểu diễn độ bất định trong việc 
+# tính toán mô hình đối với biến colour
+fplot <- ggplot(mapping = aes(y = fit, ymin = lower, ymax = upper)) + 
+  ylim(range(both2$lower, both2$upper))
+
+# Ảnh hưởng biên của colour
+fplot %+% color + aes(x = color) + geom_point() + geom_errorbar()
+
+# Ảnh hưởng có điều kiện của colour đối với các mức carat
+fplot %+% both2 + 
+  aes(x = color, colour = lcarat, group = interaction(color, lcarat)) + 
+  geom_errorbar() + geom_line(aes(group=lcarat)) + 
+  scale_colour_gradient()
+
+# Đồ thị biểu diễn độ bất định trong việc tính toán mô hình
+# đối với biến carat.
+
+# Ảnh hưởng biên của carat
+fplot %+% carat + aes(x = lcarat) + geom_smooth(stat="identity")
+
+ends <- subset(both1, lcarat == max(lcarat))
+# Ảnh hưởng có điều kiện của carat với các mức colour khác nhau
+fplot %+% both1 + aes(x = lcarat, colour = color) +
+ geom_smooth(stat="identity") + 
+ scale_colour_hue() + labs(legend.position = "none") +
+ geom_text(aes(label = color, x = lcarat + 0.02), ends)
+```
+
+## Tóm tắt các giá trị thống kê
+
+```{r statistical summaries}
+# x rời rạc
+m <- ggplot(movies, aes(year, rating))
+m + stat_summary(fun.y = "median", geom = "line")
+m + stat_summary(fun.data = "median_hilow", geom = "smooth")
+m + stat_summary(fun.y = "mean", geom = "line")
+m + stat_summary(fun.data = "mean_cl_boot", geom = "smooth")
+
+# x liên tục
+m2 <- ggplot(movies, aes(round(rating), log10(votes)))
+m2 + stat_summary(fun.y = "mean", geom = "point")
+m2 + stat_summary(fun.data = "mean_cl_normal", geom = "errorbar")
+m2 + stat_summary(fun.data = "median_hilow", geom = "pointrange")
+m2 + stat_summary(fun.data = "median_hilow", geom = "crossbar")
+```
+
+### Các hàm tóm tắt lẻ
+
+```{r individual sum}
+midm <- function(x) mean(x, trim = 0.5)
+m2 + 
+  stat_summary(aes(colour = "trimmed"), fun.y = midm, 
+    geom = "point") +
+  stat_summary(aes(colour = "raw"), fun.y = mean, 
+    geom = "point") + 
+  scale_colour_hue("Mean")
+```
+
+### Các hàm tóm tắt đơn
+
+```{r single}
+iqr <- function(x, ...) {
+  qs <- quantile(as.numeric(x), c(0.25, 0.75), na.rm = T)
+  names(qs) <- c("ymin", "ymax")
+  qs
+}
+m + stat_summary(fun.data = "iqr", geom="ribbon")
+```
+
+## Chú thích đồ thị
+
+```{r annotate}
+(unemp <- qplot(date, unemploy, data=economics, geom="line", 
+  xlab = "", ylab = "No. unemployed (1000s)"))
+
+presidential <- presidential[-(1:3), ]
+
+yrng <- range(economics$unemploy)
+xrng <- range(economics$date)
+unemp + geom_vline(aes(xintercept = as.numeric(start)), 
+  data = presidential)
+unemp + geom_rect(aes(NULL, NULL, xmin = start, xmax = end, 
+  fill = party), ymin = yrng[1], ymax = yrng[2], 
+  data = presidential) + scale_fill_manual(values = 
+  alpha(c("blue", "red"), 0.2))
+last_plot() + geom_text(aes(x = start, y = yrng[1], label = name), 
+  data = presidential, size = 3, hjust = 0, vjust = 0)
+caption <- paste(strwrap("Unemployment rates in the US have 
+  varied a lot over the years", 40), collapse="\n")
+unemp + geom_text(aes(x, y, label = caption), 
+  data = data.frame(x = xrng[2], y = yrng[2]), 
+  hjust = 1, vjust = 1, size = 4)
+
+highest <- subset(economics, unemploy == max(unemploy))
+unemp + geom_point(data = highest, 
+  size = 3, colour = alpha("red", 0.5))
+```
+
+## Dữ liệu có trọng số
+
+```{r weighted data}
+# Không có trọng số
+qplot(percwhite, percbelowpoverty, data = midwest)
+# Trọng số dân số
+qplot(percwhite, percbelowpoverty, data = midwest, 
+  size = poptotal / 1e6) + scale_size_area("Population\n(millions)", 
+  breaks = c(0.5, 1, 2, 4))
+# Trọng số khu vực
+qplot(percwhite, percbelowpoverty, data = midwest, size = area) + 
+  scale_size_area()
+
+# Vẽ đường tương quan
+lm_smooth <- geom_smooth(method = lm, size = 1)
+qplot(percwhite, percbelowpoverty, data = midwest) + lm_smooth 
+qplot(percwhite, percbelowpoverty, data = midwest, 
+  weight = popdensity, size = popdensity) + lm_smooth
+
+# Histogram không trọng số
+qplot(percbelowpoverty, data = midwest, binwidth = 1)
+# Histogram có trọng số
+qplot(percbelowpoverty, data = midwest, weight = poptotal, 
+  binwidth = 1) + ylab("population")
+````

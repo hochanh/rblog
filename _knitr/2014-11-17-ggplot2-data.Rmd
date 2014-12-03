@@ -1,0 +1,218 @@
+---
+layout: post
+title: "ggplot2: Data"
+published: yes
+---
+
+## Gói `plyr`
+
+### Làm việc với dữ liệu
+
+```{r manipulate}
+library(plyr)
+library(ggplot2)
+options(digits = 2, width = 60, max.print = 500)
+
+# Select the smallest diamond in each colour
+ddply(diamonds, .(color), subset, carat == min(carat))
+
+# Select the two smallest diamonds
+ddply(diamonds, .(color), subset, order(carat) <= 2)
+
+# Select the 1% largest diamonds in each group
+ddply(diamonds, .(color), subset, carat > 
+  quantile(carat, 0.99))
+
+# Select all diamonds bigger than the group average
+ddply(diamonds, .(color), subset, price > mean(price))
+
+# Within each colour, scale price to mean 0 and variance 1
+ddply(diamonds, .(color), transform, price = scale(price))
+
+# Subtract off group mean
+ddply(diamonds, .(color), transform, 
+  price = price - mean(price))
+
+nmissing <- function(x) sum(is.na(x))
+nmissing(msleep$name)
+nmissing(msleep$brainwt)
+
+nmissing_df <- colwise(nmissing)
+nmissing_df(msleep)
+# This is shorthand for the previous two steps
+colwise(nmissing)(msleep)
+
+msleep2 <- msleep[, -6] # Remove a column to save space
+numcolwise(median)(msleep2, na.rm = T)
+numcolwise(quantile)(msleep2, na.rm = T)
+numcolwise(quantile)(msleep2, probs = c(0.25, 0.75), 
+  na.rm = T)
+
+ddply(msleep2, .(vore), numcolwise(median), na.rm = T)
+ddply(msleep2, .(vore), numcolwise(mean), na.rm = T)
+
+my_summary <- function(df) {
+  with(df, data.frame(
+    pc_cor = cor(price, carat, method = "spearman"),
+    lpc_cor = cor(log(price), log(carat))
+  ))
+}
+ddply(diamonds, .(cut), my_summary)
+ddply(diamonds, .(color), my_summary)
+```
+
+### Vẽ biểu đồ
+
+```{r gplot}
+library(ggplot2)
+
+# Vẽ đường smooth tự động bằng ggplot2
+qplot(carat, price, data = diamonds, geom = "smooth", 
+  color = color)
+dense <- subset(diamonds, carat < 2)
+qplot(carat, price, data = dense, geom = "smooth", 
+  colour = color,  fullrange = TRUE)
+
+# Vẽ đường smooth bằng tay
+library(mgcv)
+smooth <- function(df) {
+  mod <- gam(price ~ s(carat, bs = "cs"), data = df)
+  grid <- data.frame(carat = seq(0.2, 2, length = 50))
+  pred <- predict(mod, grid, se = T)
+  
+  grid$price <- as.vector(pred$fit)
+  grid$se <- as.vector(pred$se.fit)
+  grid
+}
+smoothes <- ddply(dense, .(color), smooth)
+qplot(carat, price, data = smoothes, colour = color, 
+  geom = "line")
+qplot(carat, price, data = smoothes, colour = color, 
+  geom = "smooth", ymax = price + 2 * se, ymin = price - 2 * se)
+
+mod <- gam(price ~ s(carat, bs = "cs") + color, data = dense)
+grid <- with(diamonds, expand.grid(
+  carat = seq(0.2, 2, length = 50),
+  color = levels(color)
+))
+grid$pred <- predict(mod, grid)
+qplot(carat, pred, data = grid, colour = color, geom = "line")
+```
+
+## Gói `reshape`
+
+### Định dạng rộng
+
+```{r wide}
+qplot(date, uempmed, data = economics, geom = "line")
+qplot(date, unemploy, data = economics, geom = "line")
+qplot(unemploy, uempmed, data = economics) + geom_smooth()
+```
+
+### Biểu diễn 2 số liệu khác độ đo
+
+```{r long & wide}
+ggplot(economics, aes(date)) + 
+  geom_line(aes(y = unemploy, colour = "unemploy")) + 
+  geom_line(aes(y = uempmed, colour = "uempmed")) + 
+  scale_colour_hue("variable")
+
+library(reshape2)
+emp <- melt(economics, id = "date", 
+  measure = c("unemploy", "uempmed"))
+qplot(date, value, data = emp, geom = "line", colour = variable)
+```
+
+Có 2 lựa chọn để xử lý những số liệu không cùng độ đo:
+
+```{r rescale & facet}
+# Rescaling
+range01 <- function(x) {
+  rng <- range(x, na.rm = TRUE)
+  (x - rng[1]) / diff(rng)
+}
+emp2 <- ddply(emp, .(variable), transform, value = range01(value))
+qplot(date, value, data = emp2, geom = "line", 
+  colour = variable, linetype = variable)
+
+# Faceting
+qplot(date, value, data = emp, geom = "line") + 
+  facet_grid(variable ~ ., scales = "free_y")
+```
+
+### Tọa độ song song
+
+```{r data}
+popular <- subset(movies, votes > 1e4)
+ratings <- popular[, 7:16]
+ratings$.row <- rownames(ratings)
+molten <- melt(ratings, id = ".row")
+```
+
+```{r plot}
+# mặc định
+pcp <- ggplot(molten, aes(variable, value, group = .row))
+pcp + geom_line()
+# thêm `alpha`
+pcp + geom_line(colour = alpha("black", 1 / 20))
+# thêm `jitter`
+jit <- position_jitter(width = 0.25, height = 2.5)
+pcp + geom_line(position = jit)
+# thêm alpha cho jitter
+pcp + geom_line(colour = alpha("black", 1 / 20), position = jit)
+```
+
+```{r data2}
+cl <- kmeans(ratings[1:10], 6)
+ratings$cluster <- reorder(factor(cl$cluster), popular$rating)
+levels(ratings$cluster) <- seq_along(levels(ratings$cluster))
+molten <- melt(ratings, id = c(".row", "cluster"))
+```
+
+```{r plot2}
+pcp_cl <- ggplot(molten, 
+  aes(variable, value, group = .row, colour = cluster)) 
+pcp_cl + geom_line(position = jit, alpha = 1/5)
+pcp_cl + stat_summary(aes(group = cluster), fun.y = mean, 
+  geom = "line")
+```
+
+```{r faceting}
+library(scales)
+pcp_cl + geom_line(position = jit, colour = alpha("black", 1/5)) +
+  facet_wrap(~ cluster)
+```
+
+## Phương pháp `ggplot()`
+
+### Mô hình đơn giản
+
+```{r simple mol}
+qplot(displ, cty, data = mpg) + geom_smooth(method = "lm")
+mpgmod <- lm(cty ~ displ, data = mpg)
+head(fortify(mpgmod))
+```
+
+### Điều chỉnh mô hình
+
+```{r complexer}
+mod <- lm(cty ~ displ, data = mpg)
+basic <- ggplot(mod, aes(.fitted, .resid)) +
+  geom_hline(yintercept = 0, colour = "grey50", size = 0.5) + 
+  geom_point() + 
+  geom_smooth(size = 0.5, se = F)
+basic
+# sử dụng residual chuẩn hóa thay vì residual
+basic + aes(y = .stdresid)
+# Thêm khoảng cách Cook
+basic + aes(size = .cooksd) + scale_size_area("Cook's distance")
+```
+
+
+### Thêm biến vào mô hình
+
+```{r add vars}
+full <- basic %+% fortify(mod, mpg)
+full + aes(colour = factor(cyl))
+full + aes(displ, colour = factor(cyl))
+```

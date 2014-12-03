@@ -1,0 +1,264 @@
+---
+layout: post
+title: "ggplot2: Position"
+published: yes
+---
+
+## Facet
+
+### Grid
+
+```{r facet}
+library(ggplot2)
+mpg2 <- subset(mpg, cyl != 5 & drv %in% c("4", "f"))
+# Mặc định
+qplot(cty, hwy, data = mpg2)
+# Thêm face grid 1 hàng nhiều cột:
+qplot(cty, hwy, data = mpg2) + facet_grid(. ~ cyl)
+# Một cột nhiều hàng
+qplot(cty, data = mpg2, geom="histogram", binwidth = 2) +
+  facet_grid(cyl ~ .)
+# Nhiều hàng nhiều cột
+qplot(cty, hwy, data = mpg2) + facet_grid(drv ~ cyl)
+```
+
+### Đồ thị biên
+
+```{r margin}
+p <- qplot(displ, hwy, data = mpg2) +
+  geom_smooth(method = "lm", se = F)
+p + facet_grid(cyl ~ drv) 
+# Biên
+p + facet_grid(cyl ~ drv, margins = T)
+# Thêm màu cho đường smooth
+qplot(displ, hwy, data = mpg2) + 
+  geom_smooth(aes(colour = drv), method = "lm", se = F) + 
+  facet_grid(cyl ~ drv, margins = T) 
+```
+
+### Wrap
+
+```{r wrap}
+# Phân phối xếp hạng phim theo thập kỷ
+library(plyr)
+movies$decade <- round_any(movies$year, 10, floor)
+qplot(rating, ..density.., data=subset(movies, decade > 1890),
+  geom="histogram", binwidth = 0.5) + 
+  facet_wrap(~ decade, ncol = 6)
+```
+
+### Scales
+
+```{r scale}
+p <- qplot(cty, hwy, data = mpg)
+# scale cố định cho các facet
+p + facet_wrap(~ cyl)
+# scale tự do cho mỗi facet
+p + facet_wrap(~ cyl, scales = "free")
+
+# scale tự do đặc biệt hữu ích khi áp dụng với dữ liệu
+# chuỗi thời gian với đo độ khác nhau
+library(reshape2)
+em <- melt(economics, id = "date")
+qplot(date, value, data = em, geom = "line", group = variable) + 
+  facet_grid(variable ~ ., scale = "free_y")
+
+mpg3 <- within(mpg2, {
+  model <- reorder(model, cty)
+  manufacturer <- reorder(manufacturer, -cty)
+})
+models <- qplot(cty, model, data = mpg3)
+
+models
+# scale tự do, space tự do
+# opts() chuyển thành theme()
+# theme_text() chuyển thành element_text()
+models + facet_grid(manufacturer ~ ., scales = "free", 
+  space = "free") +  theme(strip.text.y = element_text())
+```
+
+### Group và Facet
+
+```{r group vs facet}
+xmaj <- c(0.3, 0.5, 1,3, 5)
+xmin <- as.vector(outer(1:10, 10^c(-1, 0)))
+ymaj <- c(500, 1000, 5000, 10000)
+ymin <- as.vector(outer(1:10, 10^c(2,3,4)))
+dplot <- ggplot(subset(diamonds, color %in% c("D","E","G","J")), 
+  aes(carat, price, colour = color)) + 
+  scale_x_log10(breaks = xmaj, labels = xmaj, minor = xmin) + 
+  scale_y_log10(breaks = ymaj, labels = ymaj, minor = ymin) + 
+  scale_colour_hue(limits = levels(diamonds$color)) + 
+  theme(legend.position = "none")
+# Group sẽ giống thế này
+dplot + geom_point()
+# Còn Facet thế này
+dplot + geom_point() + facet_grid(. ~ color)
+# Đường smooth
+dplot + geom_smooth(method = lm, se = F, fullrange = T)
+dplot + geom_smooth(method = lm, se = F, fullrange = T) + 
+  facet_grid(. ~ color)
+```
+
+### Dodging và Faceting
+
+```{r dodge vs. facet}
+# Dodge sẽ ra thế này
+qplot(color, data=diamonds, geom = "bar", fill = cut, 
+  position="dodge")
+# Còn Facet thế này
+qplot(cut, data = diamonds, geom = "bar", fill = cut) + 
+  facet_grid(. ~ color) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 8, 
+   colour = "grey50"))
+```
+
+```{r dodge vs. facet 2}
+mpg4 <- subset(mpg, manufacturer %in% 
+  c("audi", "volkswagen", "jeep"))
+mpg4$manufacturer <- as.character(mpg4$manufacturer)
+mpg4$model <- as.character(mpg4$model)
+
+base <- ggplot(mpg4, aes(fill = model)) + 
+  geom_bar(position = "dodge") + 
+  theme(legend.position = "none")
+# dodge
+base + aes(x = model)
+# face
+base + aes(x = model) + 
+  facet_grid(. ~ manufacturer)
+# scale phát  
+last_plot() +  
+  facet_grid(. ~ manufacturer, scales = "free_x", space = "free")
+base + aes(x = manufacturer)
+```
+
+### Biến liên tục
+
+```{r conti}
+# Chia khoảng theo độ dài
+mpg2$disp_ww <- cut_interval(mpg2$displ, length = 1)
+mpg2$disp_wn <- cut_interval(mpg2$displ, n = 6)
+# Chia khoảng theo số lượng điểm
+mpg2$disp_nn <- cut_number(mpg2$displ, n = 6)
+
+plot <- qplot(cty, hwy, data = mpg2) + labs(x = NULL, y = NULL)
+plot + facet_wrap(~ disp_ww, nrow = 1)
+plot + facet_wrap(~ disp_wn, nrow = 1)
+plot + facet_wrap(~ disp_nn, nrow = 1)
+```
+
+## Hệ tọa độ
+
+### Các hệ tọa độ
+
+#### Ví dụ ban đầu
+
+```{r coord}
+rect <- data.frame(x = 50, y = 50)
+line <- data.frame(x = c(1, 200), y = c(100, 1))
+base <- ggplot(mapping = aes(x, y)) + 
+  geom_tile(data = rect, aes(width = 50, height = 50)) + 
+  geom_line(data = line)
+# Mặc định Đề các
+base
+# Tọa độ cực
+base + coord_polar("x")
+base + coord_polar("y")
+# Đảo trục
+base + coord_flip()
+# Biến đổi
+base + coord_trans(y = "log10")
+# Đề-các cân bằng
+base + coord_equal()
+```
+
+#### Cách biến đổi hệ tọa độ 
+
+```{r trans2}
+r_grid <- seq(0, 1, length = 15)
+theta_grid <- seq(0, 3 / 2 * pi, length = 15)
+extents <- data.frame(r = range(r_grid), theta = range(theta_grid))
+base <- ggplot(extents, aes(r, theta)) + labs(aspect.ratio = 1) +
+  scale_y_continuous(expression(theta))
+# Đường ban đầu
+base + geom_point(colour = "red", size = 4) + geom_line()
+pts <- data.frame(r = r_grid, theta = theta_grid)
+# Chia đường thành các điểm
+base + geom_line() + geom_point(data = pts)
+base + geom_point(data = pts)
+# Chuyển đổi điểm
+xlab <- scale_x_continuous(expression(x == r * sin(theta)))
+ylab <- scale_y_continuous(expression(x == r * cos(theta)))
+polar <- base %+% pts + aes(x = r * sin(theta), y = r * cos(theta)) + 
+  xlab + ylab
+polar + geom_point()
+# Nối điểm thành đường
+polar + geom_point() + geom_path()
+# Kết quả
+polar + geom_point(data=extents, colour = "red", size = 4) + geom_path() 
+```
+
+### Hệ tọa độ Đề-các
+
+#### Đặt các giới hạn
+
+```{r set limits}
+(p <- qplot(disp, wt, data=mtcars) + geom_smooth())
+p + scale_x_continuous(limits = c(325, 500))
+p + coord_cartesian(xlim = c(325, 500))
+
+(d <- ggplot(diamonds, aes(carat, price)) + 
+  stat_bin2d(bins = 25, colour="grey70") + 
+  theme(legend.position = "none")) 
+d + scale_x_continuous(limits = c(0, 2))
+d + coord_cartesian(xlim = c(0, 2))
+```
+
+#### Đảo trục
+
+```{r flip axes}
+qplot(displ, cty, data = mpg) + geom_smooth()
+qplot(cty, displ, data = mpg) + geom_smooth()
+qplot(cty, displ, data = mpg) + geom_smooth() + coord_flip()
+```
+
+#### Biến đổi dữ liệu
+
+```{r transform}
+qplot(carat, price, data = diamonds, log = "xy") + 
+  geom_smooth(method = "lm")
+library(scales)
+last_plot() + coord_trans(x = exp_trans(10), y = exp_trans(10))
+```
+
+### Phi Đề-các
+
+#### Tọa độ cực
+
+```{r polar}
+(pie <- ggplot(mtcars, aes(x = factor(1), fill = factor(cyl))) +
+  geom_bar(width = 1))
+# Pie chart
+pie + coord_polar(theta = "y")
+
+# The bullseye chart
+pie + coord_polar()
+```
+
+#### Tọa độ bản đồ
+
+```{r map}
+library(maps)
+nz <- map_data("nz")
+nzmap <- ggplot(nz, aes(x=long, y=lat, group=group)) +
+  geom_polygon(fill="white", colour="black")
+
+# Tọa độ mặc định
+nzmap
+# Tọa độ bản đồ mặc định
+nzmap + coord_map()
+# Thông số khác
+nzmap + coord_map("cylindrical")
+nzmap + coord_map("azequalarea",orientation=c(-36.92,174.6,0))
+```

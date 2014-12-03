@@ -1,0 +1,174 @@
+---
+layout: post
+title: "ISL: Chapter 4"
+published: yes
+---
+
+## Bài 10
+
+```{r 10}
+library(ISLR)
+names(Weekly)
+dim(Weekly)
+summary(Weekly)
+pairs(Weekly)
+cor(Weekly[,-9])
+attach(Weekly)
+plot(Volume)
+
+# Logistic regression
+glmout=glm(Direction~.-Year-Today,data=Weekly,family=binomial)
+summary(glmout)
+glmpro=predict(glmout,type="response")
+contrasts(Direction)
+glmpre=rep("Down",1089)
+glmpre[glmpro>.5]="Up"
+table(glmpre,Direction)
+mean(glmpre==Direction)
+(172+427)/1089
+427/(427+312)
+
+# split training data
+train=(Year<2008)
+Weekly0810=Weekly[!train,]
+dim(Weekly0810)
+Direction0810=Direction[!train]
+
+# using Logistic Regression
+glmout2=glm(Direction~Lag2,data=Weekly,family=binomial,subset=train)
+glmpro2=predict(glmout2,Weekly0810,type="response")
+glmpre2=rep("Down",156)
+glmpre2[glmpro2>.5]="Up"
+table(glmpre2,Direction0810)
+mean(glmpre2==Direction0810)
+
+# using LDA
+library(MASS)
+ldaout=lda(Direction~Lag2,data=Weekly,subset=train)
+ldapro=predict(ldaout,Weekly0810)
+ldapre=ldapro$class
+table(ldapre,Direction0810)
+mean(ldapre==Direction0810)
+
+# using QDA
+qdaout=qda(Direction~Lag2,data=Weekly,subset=train)
+qdapro=predict(qdaout,Weekly0810)
+qdapre=qdapro$class
+table(qdapre,Direction0810)
+mean(qdapre==Direction0810)
+
+# using KNN, K=1
+library(class)
+trainK=matrix(Lag2[train])
+testK=matrix(Lag2[!train])
+trainD=Direction[train]
+set.seed(1)
+knnpre=knn(trainK,testK,trainD,k=1)
+table(knnpre,Direction0810)
+mean(knnpre==Direction0810)
+
+# K=3
+knnpre3=knn(trainK,testK,trainD,k=3)
+table(knnpre3,Direction0810)
+mean(knnpre3==Direction0810)
+
+# K=7
+knnpre7=knn(trainK,testK,trainD,k=7)
+table(knnpre7,Direction0810)
+mean(knnpre7==Direction0810)
+```
+
+## Bài 11
+```{r autodata}
+auto=read.csv("./ISL/Auto.csv",na.strings="?")
+auto=na.omit(auto)
+names(auto)
+dim(auto)
+summary(auto)
+summary(auto$mpg)
+mpg.medi=summary(auto$mpg)["Median"]
+mpg01=rep(0,392)
+mpg01[auto$mpg>mpg.medi]=1
+sum(mpg01)
+auto01=data.frame(auto,mpg01)
+pairs(auto01)
+
+# split training data
+trn=(auto01$year<80)
+sum(trn)
+auto80=auto01[!trn,]
+mpg80=auto01$mpg01[!trn]
+
+# perform LDA
+library(MASS)
+ldaout=lda(mpg01~horsepower+weight+acceleration,data=auto01,subset=trn)
+ldaout
+ldapro=predict(ldaout,auto80)
+ldapre=ldapro$class
+table(ldapre,mpg80)
+mean(ldapre==mpg80)
+
+# perform QDA
+qdaout=qda(mpg01~horsepower+weight+acceleration,data=auto01,subset=trn)
+qdapro=predict(qdaout,auto80)
+qdapre=qdapro$class
+table(qdapre,mpg80)
+mean(qdapre==mpg80)
+
+# perform logistic regression
+glmout=glm(mpg01~horsepower+weight+acceleration,data=auto01,subset=trn,family=binomial)
+summary(glmout)
+glmpro=predict(glmout,auto80,type="response")
+glmpre=rep(0,sum(!trn))
+glmpre[glmpro>.5]=1
+sum(glmpre)
+table(glmpre,mpg80)
+mean(glmpre==mpg80)
+
+# perform KNN
+library(class)
+attach(auto01)
+trnK=cbind(horsepower,weight,acceleration)[trn,]
+tstK=cbind(horsepower,weight,acceleration)[!trn,]
+trnD=mpg01[trn]
+set.seed(1)
+
+# K=1
+knnpre=knn(trnK,tstK,trnD,k=1)
+table(knnpre,mpg80)
+mean(knnpre==mpg80)
+
+# K=3
+knnpre=knn(trnK,tstK,trnD,k=3)
+table(knnpre,mpg80)
+mean(knnpre==mpg80)
+
+# K=5
+knnpre=knn(trnK,tstK,trnD,k=7)
+table(knnpre,mpg80)
+mean(knnpre==mpg80)
+```
+
+## Bài 12
+```{r writing functions}
+Power2=function(x,a){
+ print(x^a) 
+}
+Power2(2,3)
+
+Power3=function(x,a){
+  result=x^a
+  return(result)
+}
+
+Power2(3,8)
+plot(1:10,y=Power3(1:10,2),col=2,xlab="x",ylab="y=x^2")
+plot(1:10,y=Power3(1:10,2),col=2,xlab="x",ylab="y=x^2",log="x")
+plot(1:10,y=Power3(1:10,2),col=2,xlab="x",ylab="y=x^2",log="y")
+plot(1:10,y=Power3(1:10,2),col=2,xlab="x",ylab="y=x^2",log="xy")
+
+PlotPower=function(x,a){
+  plot(x,Power3(x,a),xlab="x",ylab=paste("x^",a))
+}
+PlotPower(1:10,1.7)
+```

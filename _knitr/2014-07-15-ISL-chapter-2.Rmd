@@ -1,0 +1,56 @@
+---
+layout: post
+title: "ISL: Chapter 2"
+published: yes
+---
+
+## `College`
+
+```{r label="download and read data"}
+# fileUrl <- "http://www-bcf.usc.edu/~gareth/ISL/College.csv"
+# download.file(fileUrl,destfile="./ISL/College.csv")
+
+college <- read.csv('./ISL/College.csv')
+rownames(college)=college[,1]
+college=college[,-1]
+summary(college)
+# pairs(college)
+pairs(college[,1:10])
+pairs(college[,1:5])
+attach(college)
+Private <- as.factor(Private)
+plot(Private,Outstate,xlab="Private",ylab="Outstate",varwidth=T)
+```
+
+```{r label="create Elite"}
+Elite=rep("No",nrow(college))
+Elite[college$Top10perc > 50]="Yes"
+Elite=as.factor(Elite)
+college=data.frame(college,Elite)
+summary(Elite)
+plot(Elite,Outstate,xlab="Elite",ylab="Outstate",varwidth=T)
+```
+
+```{r label="histogram"}
+par(mfrow=c(2,2))
+hist(Books, breaks=30,col=1)
+hist(Apps, breaks=30,col=2)
+hist(Personal, breaks=30,col=3)
+hist(Room.Board, breaks=30,col=4)
+```
+
+
+## `Boston`
+
+```{r label=boston}
+library(MASS)
+# pairs(Boston)
+pairs(Boston[,c(5:8,10:14)])
+attach(Boston)
+plot(medv,lstat)
+plot(medv,rm,col=2,pch=2)
+plot(medv,nox,col=4,pch=4)
+
+B8 = Boston[(Boston$rm>8),]
+summary(B8)
+```

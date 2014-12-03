@@ -1,0 +1,98 @@
+---
+layout: post
+title: "p-value"
+math: true
+published: yes
+---
+ 
+"p-value" hay "giá trị p" là **mức ý nghĩa**, tương tự mức ý nghĩa $$\alpha = 0.05$$ (tương đương với độ tin cậy 95% huyền thoại), nhưng lại là mức ý nghĩa **nhỏ nhất** mà tại đó **kiểm định** có ý nghĩa. Tức là?
+ 
+Xét một kiểm định về tính cân bằng của đồng xu: 
+ 
+> Tung một đồng xu 50 lần thì có 35 lần xuất hiện mặt ngửa. Vậy có kết luận được đồng xu đó là **không** cân bằng hay không?
+ 
+Gọi p là xác suất xuất hiện mặt ngửa nếu đồng xu được tung vô hạn lần ($$\hat{p}$$ là tỉ lệ xuất hiện mặt ngửa trong n lần tung), ta có giả thuyết chính $$H_0$$và giả thuyết đảo $$H_A$$ hư sau:
+ 
+$$H_0: p=0.5$$
+ 
+$$H_A: p\not=0.5$$
+ 
+Gọi X là số lần xuất hiện mặt ngửa trong 50 lần tung đồng xu thì X sẽ là biến ngẫu nhiên rời rạc có phân phối nhị phân.
+ 
+## 1. Trước hết giải bài toán với mức ý nghĩa $$\alpha =0.05$$
+ 
+### Sử dụng phân phối nhị phân:
+ 
+Số lần xuất hiện mặt ngửa t ít nhất sao cho $$P(X \ge t)=0.05$$ được tính bằng công thức
+ 
+```{r}
+t <- qbinom(1-0.05,50,0.5)
+t
+```
+ 
+31 < 35 nên chúng ta bác bỏ $$H_0$$ với độ tin cậy 95% (mức ý nghĩa 0.05).
+ 
+### Sử dụng phân phối chuẩn:
+ 
+Một tính chất của tỉ lệ xuất hiện mặt ngửa $$\hat{p}$$ trong mẫu n phần tử là:
+ 
+$$\frac{\hat{p}-p}{\sqrt{\frac{1}{n}.p(1-p)}} \sim N(0,1)$$
+ 
+Ở đây ta có:
+ 
+$$Z = \frac{\hat{p}-0.5}{\sqrt{\frac{1}{50}.0.5(1-0.5)}} \sim N(0,1)$$
+ 
+Ta đã biết $$P(\vert Z\vert>1.96) \approx 0.05$$ nên t được tính bằng công thức
+ 
+```{r}
+t <- 50*(1.96*sqrt(1/50*0.5*(1-0.5)) + 0.5)
+t
+```
+ 
+31.9 < 35 nên chúng ta đưa ra kết luận giống như trên.
+ 
+## 2. Tìm p-value
+ 
+Với $$\alpha = 0.05$$ ta tính được t = 31 và t = 31.9 theo 2 phương pháp. Vậy với t = 35 thì $$\alpha$$ tương ứng sẽ là? p-value. 
+ 
+Nói cách khác, ở đây $$\text{p-value} = P(X \ge 35)$$.
+ 
+### Sử dụng mô phỏng:
+ 
+Chúng ta sẽ thực hiện 100.000 mô phỏng tung 50 lần một đồng xu với xác suất xuất hiện mặt ngửa 0.5 rồi tính trung bình tỉ lệ xuất hiện của  mặt ngửa từ 35 lần trở lên trong 100.000 mô phỏng đó.
+ 
+```{r}
+nreps <- 100000
+bin <- rbinom(nreps,50,0.5)
+sum(bin>=35) / nreps
+```
+ 
+### Sử dụng công thức:
+ 
+$$P(X \ge 35) = \sum_{i=35}^{50}{50 \choose i}\left(\frac{1}{2}\right)^{50}$$
+ 
+Tính trên R như sau
+ 
+```{r}
+s <- 0
+for (i in 35:50) s <- s + choose(50,i)*0.5^50
+s
+```
+ 
+Để tính thay cho công thức dài ở trên, R có hàm `pbinom()` để tính xác suất tích lũy, tính như sau
+ 
+```{r}
+1 - pbinom(34,50,0.5)
+```
+ 
+Tại sao trong công thức `pbinom(34,50,0.5)` ta lại dùng 34 chứ không phải 35?
+ 
+### Sử dụng phép xấp xỉ phân phối chuẩn:
+ 
+Ta tính Z, rồi tính `1 - pnorm(Z)`
+ 
+```{r}
+z <- (35/50 - 0.5)/sqrt(1/50*0.5*(1-0.5))
+z
+1 - pnorm(z)
+```

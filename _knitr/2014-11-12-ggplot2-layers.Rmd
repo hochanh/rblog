@@ -1,0 +1,301 @@
+---
+layout: post
+title: "ggplot2: Layers"
+published: yes
+---
+
+## Tạo 1 biểu đồ
+
+```{r creating a plot}
+library(ggplot2)
+# init one
+p <- ggplot(diamonds, aes(carat, price, colour = cut))
+# add a layer
+p <- p + layer(geom = "point")  
+# Now p is this
+p
+```
+
+### Toàn bộ đối số của hàm `layer()`:
+
+```r
+ layer(geom, geom_params, stat, stat_params, data, mapping, 
+   position)
+```
+
+### Lối tắt
+
+```{r another plot}
+# Ver 1: Verbose
+p <- ggplot(diamonds, aes(x = carat))
+p <- p + layer(
+  geom = "bar", 
+  geom_params = list(fill = "steelblue"),
+  stat = "bin",
+  stat_params = list(binwidth = 2)
+)
+p
+
+# Ver 2: Shortcut
+p <- ggplot(diamonds, aes(x = carat))
+p <- p + geom_histogram(binwidth = 2, fill = "steelblue")
+p
+```
+
+#### Cấu trúc lối tắt:
+
+```r
+geom_XXX(mapping, data, ..., geom, position)
+stat_XXX(mapping, data, ..., stat, position)
+```
+
+### `ggplot` và `qplot`
+
+```{r other examples}
+ggplot(msleep, aes(sleep_rem / sleep_total, awake)) + 
+  geom_point()
+# Tương đương với
+qplot(sleep_rem / sleep_total, awake, data = msleep)
+
+# Thêm layer to qplot:
+qplot(sleep_rem / sleep_total, awake, data = msleep) + 
+  geom_smooth()
+
+# Tương đương với
+qplot(sleep_rem / sleep_total, awake, data = msleep, 
+  geom = c("point", "smooth"))
+# hoặc
+ggplot(msleep, aes(sleep_rem / sleep_total, awake)) + 
+  geom_point() + geom_smooth()
+```
+
+### Hàm `summary()`
+
+```{r summary}
+p <- ggplot(msleep, aes(sleep_rem / sleep_total, awake))
+summary(p)
+
+p <- p + geom_point()
+summary(p)
+```
+
+### Tách lớp
+
+```{r separate layer}
+bestfit <- geom_smooth(method = "lm", se = F, 
+  colour = I("steelblue"), alpha = I(0.5), size = 2)
+qplot(sleep_rem, sleep_total, data = msleep) + bestfit
+qplot(awake, brainwt, data = msleep, log = "y") + bestfit
+qplot(bodywt, brainwt, data = msleep, log = "xy") + bestfit
+```
+
+## Dữ liệu
+
+```{r data}
+p <- ggplot(mtcars, aes(mpg, wt, colour = cyl)) + geom_point()
+p
+
+# Làm mới dữ liệu
+mtcars <- transform(mtcars, mpg = mpg ^ 2)
+p %+% mtcars
+```
+
+## Các ánh xạ thẩm mỹ
+
+### Hàm `aes()`
+
+```r
+aes(x = weight, y = height, colour = age)
+aes(weight, height, colour = sqrt(age))
+```
+
+### Biểu đồ và phân lớp
+
+```{r plot & layer}
+p <- ggplot(mtcars)
+summary(p)
+
+p <- p + aes(wt, hp)
+summary(p)
+
+p <- ggplot(mtcars, aes(x = mpg, y = wt))
+p + geom_point()
+
+# Ghi đè phân lớp
+p + geom_point(aes(colour = factor(cyl)))
+p + geom_point(aes(y = disp))
+```
+
+### Thiết đặt hay ánh xạ?
+
+```{r setting vs mapping}
+p <- ggplot(mtcars, aes(mpg, wt))
+# Thiết đặt 
+p + geom_point(colour = "darkblue")  
+# Ánh xạ
+p + geom_point(aes(colour = "darkblue"))
+
+# Tương tự với `qplot()`
+qplot(mpg, wt, data=mtcars, colour = I("darkblue"))
+qplot(mpg, wt, data=mtcars, colour = "darkblue")
+```
+
+### Nhóm
+
+#### Nhiều nhóm, một thuộc tính thẩm mỹ
+
+```{r grouping 1}
+data(Oxboys, package="nlme")
+p <- ggplot(Oxboys, aes(age, height, group = Subject)) + 
+  geom_line()
+# Tương tự với `qplot()`
+qplot(age, height, data=Oxboys, group = Subject, geom="line")
+qplot(age, height, data=Oxboys, geom="line")
+```
+
+#### Các nhóm khác nhau với các thuộc tính thẩm mỹ (lớp) khác nhau
+
+```{r grouping 2}
+p + geom_smooth(aes(group = Subject), method="lm", se = F)
+p + geom_smooth(aes(group = 1), method="lm", size = 2, se = F)
+
+# Tương tự với `qplot()`
+qplot(age, height, data=Oxboys, group = Subject, geom="line") +
+  geom_smooth(method="lm", se = F)
+qplot(age, height, data=Oxboys, group = Subject, geom="line") +
+  geom_smooth(aes(group = 1), method="lm", size = 2, se = F)
+```
+
+#### Ghi đè nhóm mặc định
+
+```{r grouping 3}
+(boysbox <- ggplot(Oxboys, aes(Occasion, height)) + geom_boxplot())
+boysbox + geom_line(aes(group = Subject), colour = "#3366FF")
+
+# Tương tự với `qplot()`
+qplot(Occasion, height, data=Oxboys, geom="boxplot")
+qplot(Occasion, height, data=Oxboys, geom="boxplot") +
+ geom_line(aes(group = Subject), colour="#3366FF")
+```
+
+### Ghép thuộc tính thẩm mỹ với đối tượng đồ họa
+
+#### Đường thẳng
+
+```{r matching lines}
+df <- data.frame(x = 1:3, y = 1:3, colour = c(1,3,5))
+# Ver 1
+qplot(x, y, data=df, colour=factor(colour), size = I(5)) + 
+  geom_line(aes(group = 1), size = 2)
+
+# Ver 2
+qplot(x, y, data=df, colour=colour, size = I(5)) + 
+  geom_line(size = 2)
+
+# Chuyển đổi biến rời rạc thành biến liên tục
+xgrid <- with(df, seq(min(x), max(x), length = 50))
+interp <- data.frame(
+  x = xgrid,
+  y = approx(df$x, df$y, xout = xgrid)$y,
+  colour = approx(df$x, df$colour, xout = xgrid)$y  
+)
+
+# Ver 3
+qplot(x, y, data = df, colour = colour, size = I(5)) + 
+  geom_line(data = interp, size = 2)
+```
+
+#### Đa giác
+
+```{r matching polygon}
+qplot(color, data = diamonds)
+qplot(color, data = diamonds, fill = cut)
+```
+
+## Phép biến đổi thống kê
+
+```{r stat}
+ggplot(diamonds, aes(carat)) + 
+  geom_histogram(aes(y = ..density..), binwidth = 0.1)
+
+# Tương tự với `qplot()`  
+qplot(carat, ..density.., data = diamonds, geom="histogram", 
+  binwidth = 0.1)
+```
+
+## Điều chỉnh vị trí
+
+```{r position adjustments}
+# Stack, fill & dodge
+dplot <- ggplot(diamonds, aes(clarity, fill = cut))
+dplot + geom_bar(position = "stack")
+dplot + geom_bar(position = "fill")
+dplot + geom_bar(position = "dodge")
+
+# Identity
+dplot + geom_bar(position = "identity")
+qplot(clarity, data = diamonds, geom="line", colour = cut, 
+  stat="bin", group=cut)
+```
+
+## Kết hợp tất cả!
+
+### Kết hợp geoms và stats
+
+```{r geoms and stats}
+d <- ggplot(diamonds, aes(carat)) + xlim(0, 3)
+# Ver 1: area geom
+d + stat_bin(aes(ymax = ..count..), binwidth = 0.1, geom = "area")
+# Ver 2: point geom
+d + stat_bin(
+  aes(size = ..density..), binwidth = 0.1, 
+  geom = "point", position="identity"
+)
+# # Ver 3: tile geom
+d + stat_bin2d(aes(y = 1), binwidth = c(0.1,1))
+```
+
+### Vẽ đồ thị cho các thống kê tính trước
+
+```r
+stat_identity()
+```
+
+### Thay đổi thuộc tính thẩm mỹ và dữ liệu
+
+```{r vary aes & data}
+require(nlme, quiet = TRUE, warn.conflicts = FALSE)
+# Chạy mô hình 1
+model <- lme(height ~ age, data = Oxboys, 
+ random = ~ 1 + age | Subject)
+# Khởi tạo plot
+oplot <- ggplot(Oxboys, aes(age, height, group = Subject)) + 
+  geom_line()
+
+# So sánh giữa thực tế và mô hình:
+# 1. Tính toán theo mô hình
+#    từ dữ liệu tự khởi tạo.
+age_grid <- seq(-1, 1, length = 10)
+subjects <- unique(Oxboys$Subject)
+
+preds <- expand.grid(age = age_grid, Subject = subjects)
+preds$height <- predict(model, preds)
+
+oplot + geom_line(data = preds, colour = "#3366FF", size= 0.4)
+
+# 2. Tính toán theo mô hình
+#    từ dữ liệu gốc.
+Oxboys$fitted <- predict(model)
+Oxboys$resid <- with(Oxboys, fitted - height)
+
+# Cập nhật dữ liệu gốc, đổi trục tung thành residual,
+# và thêm một đường smooth.
+oplot %+% Oxboys + aes(y = resid) + geom_smooth(aes(group=1))
+
+# Chạy mô hình 2
+model2 <- update(model, height ~ age + I(age ^ 2))
+Oxboys$fitted2 <- predict(model2)
+Oxboys$resid2 <- with(Oxboys, fitted2 - height)
+
+oplot %+% Oxboys + aes(y = resid2) + geom_smooth(aes(group=1))
+```

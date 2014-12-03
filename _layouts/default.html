@@ -1,0 +1,14 @@
+{% include header %}
+<body>
+  <div role="main" class="main">
+    {{ content }}
+  </div>
+</body>
+{% include footer %}
+
+{% if page.math %}
+{% include math %}
+{% endif %}
+
+{% include ga %}
+</html>

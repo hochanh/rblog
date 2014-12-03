@@ -1,0 +1,113 @@
+---
+layout: post
+title: "ISL: Chaper 3"
+published: yes
+---
+
+## Bài 8
+
+```{r label="mpg vs horsepower"}
+# fileUrl <- "http://www-bcf.usc.edu/~gareth/ISL/Auto.csv"
+# download.file(fileUrl,destfile="./ISL/Auto.csv")
+auto=read.csv("./ISL/Auto.csv")
+auto=na.omit(auto)
+names(auto)
+auto$horsepower=as.numeric(auto$horsepower)
+lmout=lm(mpg ~ horsepower,data=auto)
+summary(lmout)
+predict(lmout,data.frame(horsepower=98))
+predict(lmout,data.frame(horsepower=98),interval="confidence")
+predict(lmout,data.frame(horsepower=98),interval="prediction")
+plot(auto$horsepower,auto$mpg,col=3)
+abline(lmout,lwd=3,col=2)
+plot(predict(lmout), residuals(lmout))
+plot(predict(lmout), rstudent(lmout))
+par(mfrow=c(2,2))
+plot(lmout)
+```
+
+## Bài 9
+
+```{r label="mul"}
+pairs(auto)
+str(auto)
+pairs(auto[c(1:6)])
+cor(auto[c(1:6)])
+lmout2=lm(mpg~.-name,data=auto)
+summary(lmout2)
+par(mfrow=c(2,2))
+plot(lmout2)
+```
+
+## Bài 10
+
+```{r label="carseats"}
+library(ISLR)
+names(Carseats)
+attach(Carseats)
+lmsales=lm(Sales~Price+Urban+US)
+summary(lmsales)
+contrasts(Urban)
+summary(lm(Sales~Urban))
+lmsales2=lm(Sales~Price+US)
+summary(lmsales2)
+coef(summary(lmsales2))
+```
+
+## Bài 11
+
+```{r}
+set.seed(1)
+x=rnorm(100)
+y=2*x+rnorm(100)
+lmyx=lm(y~x-1)
+# or lmxy=lm(y~x+0)
+summary(lmyx)
+lmxy=lm(x~y-1)
+summary(lmxy)
+summary(lm(x~y))
+summary(lm(y~x))
+```
+
+## Bài 13
+
+```{r label="noise"}
+set.seed(28)
+x=rnorm(100)
+eps=rnorm(100,sd=0.25)
+y=-1+0.5*x+eps
+lm13=lm(y~x)
+summary(lm13)
+plot(x,y)
+abline(lm13,col=2,lwd=2)
+abline(-1,0.5,col=3,lwd=2)
+legend(-2.5,0.3,c("Least square lines","Population regression line"),col=c(2,3),lwd=2)
+
+lmx2=lm(y~x+I(x^2))
+anova(lmx2,lm13)
+```
+
+## Bài 14
+
+```{r label="collinearity"}
+set.seed(1)
+x1=runif(100)
+x2=0.5*x1+rnorm(100)/10
+y=2+2*x1+0.3*x2+rnorm(100)
+cor(x1,x2)
+pairs(data.frame(x1,x2,y),col=2)
+summary(lm(y~x1+x2))
+summary(lm(y~x1))
+summary(lm(y~x2))
+
+x1=c(x1,0.1)
+x2=c(x2,0.8)
+y=c(y,6)
+summary(lm(y~x1+x2))
+summary(lm(y~x1))
+summary(lm(y~x2))
+par(mfrow=c(2,2))
+plot(lm(y~x1+x2))
+plot(lm(y~x1))
+plot(lm(y~x2))
+```

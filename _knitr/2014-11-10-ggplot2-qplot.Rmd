@@ -1,0 +1,173 @@
+---
+layout: post
+title: "ggplot2: qplot()"
+published: yes
+---
+
+## Dữ liệu
+
+```{r data}
+library(ggplot2)
+head(diamonds)
+set.seed(1410)
+dsmall <- diamonds[sample(nrow(diamonds), 100), ]
+```
+
+## Lệnh cơ bản
+
+```{r basic use}
+# Basic use
+qplot(carat, price, data = diamonds)
+qplot(log(carat), log(price), data = diamonds)
+qplot(carat, x * y * z, data = diamonds)
+```
+
+## Các thuộc tính thẩm mỹ
+
+```{r other aesthetic}
+# Color and shape
+qplot(carat, price, data = dsmall, colour = color)
+qplot(carat, price, data = dsmall, shape = cut)
+
+# Alpha aesthetic
+qplot(carat, price, data = diamonds, alpha = I(1/10))
+qplot(carat, price, data = diamonds, alpha = I(1/100))
+qplot(carat, price, data = diamonds, alpha = I(1/200))
+
+# Add smoother
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"))
+qplot(carat, price, data = diamonds, geom = c("point", "smooth"))
+```
+
+## Các đối tượng hình học
+
+### Thêm `smoother`
+
+```{r smoother}
+# method = "loess", default for n < 1000
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"), 
+  span = 0.2)
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"),
+  span = 1)
+
+# method = "gam", default for n > 1000
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"),
+  method = "gam", formula = y ~ s(x))
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"),
+  method = "gam", formula = y ~ s(x, bs = "cs"))
+
+# method = "lm"
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"),
+  method = "lm")
+
+library(splines)
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"),
+  method = "lm", formula = y ~ ns(x,5))
+
+# method = "rlm"
+library(MASS)
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"),
+  method = "rlm")
+```
+
+### Boxplots và jittered points
+
+```{r boxplot and jitter}
+# Basic command
+qplot(color, price / carat, data = diamonds, geom = "jitter")
+qplot(color, price / carat, data = diamonds, geom = "boxplot")
+
+# More colorful?
+qplot(color, price / carat, data = diamonds, geom = "jitter",
+  color = color)
+qplot(color, price / carat, data = diamonds, geom = "boxplot",
+  fill = color)
+
+# Add semi-transparent
+qplot(color, price / carat, data = diamonds, geom = "jitter", 
+  alpha = I(1 / 5))
+qplot(color, price / carat, data = diamonds, geom = "jitter", 
+  alpha = I(1 / 50))
+qplot(color, price / carat, data = diamonds, geom = "jitter", 
+  alpha = I(1 / 200))
+```
+
+### Hoành đồ và mật độ
+
+```{r histo & densi}
+# basic
+qplot(carat, data = diamonds, geom = "histogram")
+qplot(carat, data = diamonds, geom = "density")
+
+# add binwidth & xlim
+qplot(carat, data = diamonds, geom = "histogram", binwidth = 1,
+  xlim = c(0,3))
+qplot(carat, data = diamonds, geom = "histogram", binwidth = 0.1,
+  xlim = c(0,3))
+qplot(carat, data = diamonds, geom = "histogram", binwidth = 0.01,
+  xlim = c(0,3))
+
+# more colorful?
+qplot(carat, data = diamonds, geom = "density", colour = color)
+qplot(carat, data = diamonds, geom = "histogram", fill = color)
+```
+
+### Biểu đồ cột
+
+```{r bar chart}
+# simple version
+qplot(color, data = diamonds, geom = "bar")
+
+# weighted version (by carat)
+qplot(color, data = diamonds, geom = "bar", weight = carat) +
+  scale_y_continuous("carat")
+
+# more colorful?
+qplot(color, data = diamonds, geom = "bar", fill = color)
+```
+
+### Chuỗi thời gian
+
+```{r time series}
+# with line
+qplot(date, unemploy / pop, data = economics, geom = "line")
+qplot(date, uempmed, data = economics, geom = "line")
+
+# with path
+year <- function(x) as.POSIXlt(x)$year + 1900
+qplot(unemploy / pop, uempmed, data = economics,
+  geom = c("point", "path"))
+qplot(unemploy / pop, uempmed, data = economics,
+  geom = "path", color = year(date)) + scale_size_area()
+```
+
+## Faceting
+
+```{r faceting}
+# facets
+qplot(carat, data = diamonds, facets = color ~ .,
+  geom = "histogram", binwidth = 0.1, xlim = c(0, 3))
+# with ..density..
+qplot(carat, ..density.., data = diamonds, facets = color ~ .,
+  geom = "histogram", binwidth = 0.1, xlim = c(0, 3))
+```
+
+## Các tùy chọn khác
+
+```{r other opts}
+qplot(
+  carat, price, data = dsmall,
+  xlab = "Price ($)", ylab = "Weight (carats)",
+  main = "Price-weight relationship"
+)
+
+qplot(
+  carat, price/carat, data = dsmall,
+  ylab = expression(frac(price,carat)),
+  xlab = "Weight (carats)",
+  main="Small diamonds",
+  xlim = c(.2,1)
+)
+
+qplot(carat, price, data = dsmall, log = "xy")
+```

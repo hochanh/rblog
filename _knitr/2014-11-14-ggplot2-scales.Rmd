@@ -1,0 +1,186 @@
+---
+layout: post
+title: "ggplot2: Scales"
+published: yes
+---
+
+## Sử dụng `scales`
+
+```{r usage}
+library(ggplot2)
+plot <- qplot(cty, hwy, data = mpg)
+plot
+
+plot + aes(x = drv)
+```
+
+```{r modify scale}
+p <- qplot(sleep_total, sleep_cycle, data = msleep, colour = vore)
+p 
+# Explicitly add the default scale
+p + scale_colour_hue()
+
+# Adjust parameters of the default, here changing the appearance 
+# of the legend
+p + scale_colour_hue("What does\nit eat?", 
+   breaks = c("herbi", "carni", "omni", NA), 
+   labels = c("plants", "meat", "both", "don't know"))
+
+# Use a different scale
+p + scale_colour_brewer(palette = "Set1")
+```
+
+## Các chi tiết
+
+### Tên
+
+```{r cm}
+p <- qplot(cty, hwy, data = mpg, colour = displ)
+p
+p + scale_x_continuous("City mpg")
+p + xlab("City mpg")
+p + ylab("Highway mpg")
+p + labs(x = "City mpg", y = "Highway", colour = "Displacement")
+p + xlab(expression(frac(miles, gallon)))
+```
+
+### breaks và limits
+
+```{r b&l}
+p <- qplot(cyl, wt, data = mtcars)
+p
+p + scale_x_continuous(breaks = c(4, 8))
+p + scale_x_continuous(limits = c(4, 8))
+p <- qplot(wt, cyl, data = mtcars, colour = cyl)
+p
+p + scale_colour_gradient(breaks = c(5.5, 6.5))
+p + scale_colour_gradient(limits = c(5.5, 6.5))
+```
+
+### Chuyển đổi
+
+```{r scale x}
+# Khác nhau giữa log scale và log data: tên các trục khác nhau
+qplot(log10(carat), log10(price), data = diamonds)
+qplot(carat, price, data = diamonds) + 
+  scale_x_log10() + scale_y_log10()
+```
+
+### Thời gian và ngày tháng
+
+```{r date time}
+plot <- qplot(date, psavert, data = economics, geom = "line") + 
+  ylab("Personal savings rate") +
+  geom_hline(xintercept = 0, colour = "grey50")
+plot
+# Cần thêm thư viện 'scales'
+library(scales)
+plot + scale_x_date(breaks = date_breaks("10 years"))
+plot + scale_x_date(
+  limits = as.Date(c("2004-01-01", "2005-01-01")),
+  labels = date_format("%Y-%m-%d")
+)
+```
+
+### Màu sắc
+
+```{r gradient}
+# gradient và gradient2
+f2d <- with(faithful, MASS::kde2d(eruptions, waiting, 
+  h = c(1, 10), n = 50))
+df <- with(f2d, cbind(expand.grid(x, y), as.vector(z)))
+names(df) <- c("eruptions", "waiting", "density")
+erupt <- ggplot(df, aes(waiting, eruptions, fill = density)) +
+  geom_tile() +
+  scale_x_continuous(expand = c(0, 0)) + 
+  scale_y_continuous(expand = c(0, 0))
+erupt + scale_fill_gradient(limits = c(0, 0.04))
+erupt + scale_fill_gradient(limits = c(0, 0.04), 
+  low = "white", high = "black") 
+erupt + scale_fill_gradient2(limits = c(-0.04, 0.04), 
+  midpoint = mean(df$density)) 
+
+# gradientn
+library(vcd)
+fill_gradn <- function(pal) {
+  scale_fill_gradientn(colours = pal(7), limits = c(0, 0.04))
+}
+# Tải thêm thư viện `colorspace`
+library(colorspace)
+erupt + fill_gradn(rainbow_hcl)
+erupt + fill_gradn(diverge_hcl)
+erupt + fill_gradn(heat_hcl)
+
+# 3 ColorBrewer palettes
+point <- qplot(brainwt, bodywt, data = msleep, log = "xy", 
+  colour = vore)
+area <- qplot(log10(brainwt), data = msleep, fill = vore, 
+  binwidth = 1)
+# Chú ý 'pal=' không làm việc, phải dùng 'palette=', không hiểu
+# tại sao.
+point + scale_colour_brewer(palette = "Set1")
+point + scale_colour_brewer(palette = "Set2")
+point + scale_colour_brewer(palette = "Pastel1")
+area + scale_fill_brewer(palette = "Set1")
+area + scale_fill_brewer(palette = "Set2")
+area + scale_fill_brewer(palette = "Pastel1")
+```
+
+### Tùy chỉnh
+
+```{r manual}
+# Màu tùy chỉnh
+plot <- qplot(brainwt, bodywt, data = msleep, log = "xy")
+plot + aes(colour = vore) + 
+  scale_colour_manual(values = c("red", "orange", "yellow", 
+    "green", "blue"))
+colours <- c(carni = "red", "NA" = "orange", insecti = "yellow", 
+  herbi = "green", omni = "blue")
+plot + aes(colour = vore) + scale_colour_manual(values = colours)
+# Hình dạng tùy chỉnh
+plot + aes(shape = vore) + 
+  scale_shape_manual(values = c(1, 2, 6, 0, 23))
+
+# Đa màu sắc
+huron <- data.frame(year = 1875:1972, level = LakeHuron)
+ggplot(huron, aes(year)) +
+  geom_line(aes(y = level - 5), colour = "blue") + 
+  geom_line(aes(y = level + 5), colour = "red")
+
+ggplot(huron, aes(year)) +
+  geom_line(aes(y = level - 5, colour = "below")) + 
+  geom_line(aes(y = level + 5, colour = "above"))
+
+ggplot(huron, aes(year)) +
+  geom_line(aes(y = level - 5, colour = "below")) + 
+  geom_line(aes(y = level + 5, colour = "above")) + 
+  scale_colour_manual("Direction", 
+    values = c("below" = "blue", "above" = "red"))
+```
+
+### Scale đồng nhất
+
+```{r identity}
+x <- colors()
+luv <- as.data.frame(convertColor(t(col2rgb(x)), "sRGB", "Luv"))
+qplot(u, v, data=luv, colour = x, size = I(3)) + scale_colour_identity() +
+   coord_equal()
+```
+
+## Chú giải
+
+```{r legend}
+# Legends produced by geom: point, line, point and line, and bar.
+p <- ggplot(diamonds[1:100, ], aes(price, carat, colour = cut))
+p + geom_point()
+p + geom_line()
+p + geom_point() + geom_line()
+p + geom_bar(binwidth = 100) + aes(fill = cut, y = ..count..)
+
+# Colour legend, shape legend, colour + shape legend.
+p <- ggplot(diamonds[1:100, ], aes(price, carat)) +  
+  geom_point()
+p + aes(colour = cut)
+p + aes(shape = cut)
+p + aes(shape = cut, colour = cut)
+```

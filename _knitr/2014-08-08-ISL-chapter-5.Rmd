@@ -1,0 +1,149 @@
+---
+layout: post
+title: "ISL: Chapter 5"
+published: yes
+---
+
+## Bài 5
+
+```{r Default data set}
+# Fit a logistic model
+library(ISLR)
+names(Default)
+attach(Default)
+glmout=glm(default~income+balance,data=Default,family=binomial)
+summary(glmout)
+glmpro=predict(glmout,type="response")
+contrasts(default)
+glmpre=rep("No",10000)
+glmpre[glmpro>.5]="Yes"
+table(glmpre,default)
+mean(glmpre==default)
+# Validation approach
+set.seed(777)
+train=sample(10000,5000)
+valid.set=Default[-train,]
+glmout=glm(default~income+balance,data=Default,family=binomial,subset=train)
+glmpro=predict(glmout,valid.set,type="response")
+glmpre=rep("No",5000)
+glmpre[glmpro>.5]="Yes"
+mean(glmpre==valid.set$default)
+# Repeat #2
+set.seed(298)
+train=sample(10000,5000)
+valid.set=Default[-train,]
+glmout=glm(default~income+balance,data=Default,family=binomial,subset=train)
+glmpro=predict(glmout,valid.set,type="response")
+glmpre=rep("No",5000)
+glmpre[glmpro>.5]="Yes"
+mean(glmpre==valid.set$default)
+# Repeat #3
+set.seed(777298)
+train=sample(10000,5000)
+valid.set=Default[-train,]
+glmout=glm(default~income+balance,data=Default,family=binomial,subset=train)
+glmpro=predict(glmout,valid.set,type="response")
+glmpre=rep("No",5000)
+glmpre[glmpro>.5]="Yes"
+mean(glmpre==valid.set$default)
+# Add dummy variable 'student'
+set.seed(777)
+train=sample(10000,5000)
+valid.set=Default[-train,]
+glmout=glm(default~income+balance+student,data=Default,family=binomial,subset=train)
+contrasts(student)
+glmpro=predict(glmout,valid.set,type="response")
+glmpre=rep("No",5000)
+glmpre[glmpro>.5]="Yes"
+mean(glmpre==valid.set$default)
+```
+
+## Bài 6
+
+```{r bootstrap}
+library(ISLR)
+library(boot)
+attach(Default)
+glmout=glm(default~income+balance,data=Default,family=binomial)
+summary(glmout)$coef
+coef(glmout)
+boot.fn=function(data,index)
+ return(coef(glm(default~income+balance,data=data,family=binomial,subset=index)))
+set.seed(298)
+# boot(Default,boot.fn,1000)
+# 
+# ORDINARY NONPARAMETRIC BOOTSTRAP
+# 
+# 
+# Call:
+# boot(data = Default, statistic = boot.fn, R = 1000)
+# 
+# 
+# Bootstrap Statistics :
+#          original        bias     std. error
+# t1* -1.154047e+01 -2.227518e-02 4.364461e-01
+# t2*  2.080898e-05  4.609849e-08 4.774216e-06
+# t3*  5.647103e-03  1.223872e-05 2.299849e-04
+```
+
+## Bài 7
+
+```{r LOOCV}
+library(ISLR)
+attach(Weekly)
+glmout=glm(Direction~Lag1+Lag2,data=Weekly,family=binomial)
+glmout1=glm(Direction~Lag1+Lag2,data=Weekly,family=binomial,subset=(2:1089))
+glmpre=if(predict.glm(glmout1,Weekly[1,],type="response")>0.5) "Up" else "Down"
+glmpre
+Weekly[i,]$Direction
+glmpre==as.character(Weekly[i,]$Direction)
+```
+
+Thực hiện lặp và dùng công thức để tính LOOCV error. Bỏ dấu # để chạy lệnh.
+
+```{r loop}
+# n=1089
+# err=rep(0,n)
+# for (i in 1:n) {
+#   glmouti=glm(Direction~Lag1+Lag2,data=Weekly,family=binomial,subset=(1:1089)!=i)
+#   glmproi=predict.glm(glmouti,Weekly[i,],type="response")
+#   glmprei=if (glmproi>.5) "Up" else "Down"
+#   err[i]=ifelse(glmprei==as.character(Weekly[i,]$Direction),0,1)
+#   }
+# mean(err)
+# [1] 0.4499541
+
+# library(boot)
+# cost <- function(r, pi = 0) mean(abs(r-pi) > 0.5)
+# cv.glm(Weekly,glmout,cost, K=1089)$delta[1]
+# [1] 0.4499541
+
+```
+
+Chú ý khi gọi hàm `cv.glm()` với phân phối `binomial` của `glm()` phải có hàm cost như sau:
+
+```r
+cost <- function(r, pi = 0) mean(abs(r-pi) > 0.5)
+```
+
+## Bài 8
+
+```{r cv}
+set.seed (1)
+y=rnorm(100)
+x=rnorm(100)
+y=x-2*x^2+rnorm(100)
+plot(x,y)
+xy=data.frame(x,y)
+set.seed(777)
+library(boot)
+glm.fit=glm(y~x,data=xy)
+cv.err=cv.glm(xy,glm.fit)
+cv.err$delta
+
+for (i in 1:4) {
+glm.fit=glm(y~poly(x,i),data=xy)
+cv.err=cv.glm(xy,glm.fit)
+print(paste("delta for i =",i,": ",cv.err$delta[1]))
+}
+```

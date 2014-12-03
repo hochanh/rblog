@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>GeoMapID29941ee2c771</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<style type="text/css">
+body {
+  color: #444444;
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: 75%;
+  }
+  a {
+  color: #4D87C7;
+  text-decoration: none;
+}
+</style>
+</head>
+<body>
+ <!-- GeoMap generated in R 3.1.2 by googleVis 0.5.6 package -->
+<!-- Thu Nov 20 23:06:39 2014 -->
+
+
+<!-- jsHeader -->
+<script type="text/javascript">
+ 
+// jsData 
+function gvisDataGeoMapID29941ee2c771 () {
+var data = new google.visualization.DataTable();
+var datajson =
+[
+ [
+ "Hà Nội",
+2087 
+],
+[
+ "Bắc Ninh",
+1354 
+],
+[
+ "Hải Dương",
+1055 
+],
+[
+ "Hải Phòng",
+1260 
+],
+[
+ "Hưng Yên",
+1244 
+],
+[
+ "Thái Bình",
+1139 
+],
+[
+ "Hà Nam",
+923 
+],
+[
+ "Nam Định",
+1113 
+],
+[
+ "TP.Hồ Chí Minh",
+3731 
+],
+[
+ "Cần Thơ",
+868 
+] 
+];
+data.addColumn('string','Province');
+data.addColumn('number','Pop.Area');
+data.addRows(datajson);
+return(data);
+}
+ 
+// jsDrawChart
+function drawChartGeoMapID29941ee2c771() {
+var data = gvisDataGeoMapID29941ee2c771();
+var options = {};
+options["dataMode"] = "markers";
+options["width"] =    400;
+options["height"] =    500;
+options["region"] = "VN";
+
+
+    var chart = new google.visualization.GeoMap(
+    document.getElementById('GeoMapID29941ee2c771')
+    );
+    chart.draw(data,options);
+    
+
+}
+  
+ 
+// jsDisplayChart
+(function() {
+var pkgs = window.__gvisPackages = window.__gvisPackages || [];
+var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
+var chartid = "geomap";
+  
+// Manually see if chartid is in pkgs (not all browsers support Array.indexOf)
+var i, newPackage = true;
+for (i = 0; newPackage && i < pkgs.length; i++) {
+if (pkgs[i] === chartid)
+newPackage = false;
+}
+if (newPackage)
+  pkgs.push(chartid);
+  
+// Add the drawChart function to the global list of callbacks
+callbacks.push(drawChartGeoMapID29941ee2c771);
+})();
+function displayChartGeoMapID29941ee2c771() {
+  var pkgs = window.__gvisPackages = window.__gvisPackages || [];
+  var callbacks = window.__gvisCallbacks = window.__gvisCallbacks || [];
+  window.clearTimeout(window.__gvisLoad);
+  // The timeout is set to 100 because otherwise the container div we are
+  // targeting might not be part of the document yet
+  window.__gvisLoad = setTimeout(function() {
+  var pkgCount = pkgs.length;
+  google.load("visualization", "1", { packages:pkgs, callback: function() {
+  if (pkgCount != pkgs.length) {
+  // Race condition where another setTimeout call snuck in after us; if
+  // that call added a package, we must not shift its callback
+  return;
+}
+while (callbacks.length > 0)
+callbacks.shift()();
+} });
+}, 100);
+}
+ 
+// jsFooter
+</script>
+ 
+<!-- jsChart -->  
+<script type="text/javascript" src="https://www.google.com/jsapi?callback=displayChartGeoMapID29941ee2c771"></script>
+ 
+<!-- divChart -->
+  
+<div id="GeoMapID29941ee2c771" 
+  style="width: 400; height: 500;">
+</div>
+ <div><span>Data: top10 &#8226; Chart ID: <a href="Chart_GeoMapID29941ee2c771.html">GeoMapID29941ee2c771</a> &#8226; <a href="https://github.com/mages/googleVis">googleVis-0.5.6</a></span><br /> 
+<!-- htmlFooter -->
+<span> 
+  R version 3.1.2 (2014-10-31) 
+  &#8226; <a href="https://developers.google.com/terms/">Google Terms of Use</a> &#8226; <a href="https://google-developers.appspot.com/chart/interactive/docs/gallery/geomap">Documentation and Data Policy</a>
+</span></div>
+</body>
+</html>
