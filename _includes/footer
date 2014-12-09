@@ -7,7 +7,7 @@
 {% endif %}
 
 {% if page.converted %}
-	<a href="{{ page.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/vomanhtai/vomanhtai.github.io/master/_knitr/" }}" title="Rmd file" target="_blank">[Tệp .Rmd]</a>
+	<a href="{{ page.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/vomanhtai/vomanhtai.github.io/master/_knitr/" }}" title="Rmd file" target="_blank">[code]</a>
 {% endif %}
 </p>
 </div>
