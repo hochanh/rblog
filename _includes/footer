@@ -3,7 +3,7 @@
 {% if page.title %}
 	<a href="../">[quay lại]&nbsp;</a>
 {% else %}
-	<a href="../contact" title="contact">[liên hệ]&nbsp;</a>
+	<a href="./contact" title="contact">[liên hệ]&nbsp;</a>
 {% endif %}
 
 {% if page.converted %}
