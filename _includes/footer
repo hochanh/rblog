@@ -1,9 +1,9 @@
 <div id="foot">
 <p>
 {% if page.title %}
-	<a href="../">[quay lại]&nbsp;</a>
+	<a href="../">[quay lại]</a>&nbsp;
 {% else %}
-	<a href="./contact" title="contact">[liên hệ]&nbsp;</a>
+	<a href="./contact" title="contact">[liên hệ]</a>&nbsp;
 {% endif %}
 
 {% if page.converted %}
