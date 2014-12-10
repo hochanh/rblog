@@ -14,14 +14,14 @@
 
 <body>
   <div role="main" class="main">
-		<h1><a href="http://hochanh.github.io/rblog">[hochanh.github.io/rblog]</a></h1>
+		<h1>MạnhTài.vn &bull; <a href="http://hochanh.github.io/rblog">[hochanh.github.io/rblog]</a></h1>
 		<hr />
     <article>
 		{% for post in site.posts %}
 			<p>&raquo; 
 			<a href=".{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
 			{% if post.converted %}
-				<span style="float: right"><a href="{{ post.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/hochanh/rblog/master/_knitr/" }}" title="Rmd file" target="_blank">[code]</a>
+				<span style="float: right"><a href="{{ post.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/hochanh/rblog/gh-pages/_knitr/" }}" title="Rmd file" target="_blank">[code]</a>
 				</span>
 			{% endif %}
 			</p>

@@ -92,4 +92,4 @@ spplot(geo63, "ID_1", main="63 tỉnh")
 ![Việt Nam](../figures/ban-do-viet-nam-in-r/geo63.png){: .fig}
  
  
-Tải tệp [`geo63.rds`](http://raw.githubusercontent.com/hochanh/rblog/master/_knitr/vietnam/geo63.rds).
+Tải tệp [`geo63.rds`](http://raw.githubusercontent.com/hochanh/rblog/gh-pages/_knitr/vietnam/geo63.rds).
