@@ -72,7 +72,7 @@ plot(gadm[c(18,20),])
 plot(gadm63[10, ], add = TRUE, border = "red", lwd = 2)
 {% endhighlight %}
  
-![Hà Nội](../../figures/ban-do-viet-nam-in-r/hanoi.png){: .fig}
+![Hà Nội](../figures/ban-do-viet-nam-in-r/hanoi.png){: .fig}
  
 Lưu lại dùng sau:
  
@@ -89,7 +89,7 @@ geo63 <- readRDS("./vietnam/geo63.rds")
 spplot(geo63, "ID_1", main="63 tỉnh")
 {% endhighlight %}
  
-![Việt Nam](../../figures/ban-do-viet-nam-in-r/geo63.png){: .fig}
+![Việt Nam](../figures/ban-do-viet-nam-in-r/geo63.png){: .fig}
  
  
-Tải tệp [`geo63.rds`](http://raw.githubusercontent.com/vomanhtai/vomanhtai.github.io/master/_knitr/vietnam/geo63.rds).
+Tải tệp [`geo63.rds`](http://raw.githubusercontent.com/hochanh/rblog/master/_knitr/vietnam/geo63.rds).

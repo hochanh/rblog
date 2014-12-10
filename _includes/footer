@@ -3,11 +3,11 @@
 {% if page.title %}
 	<a href="../">[quay lại]&nbsp;</a>
 {% else %}
-	<a href="/contact" title="contact">[liên hệ]&nbsp;</a>
+	<a href="../contact" title="contact">[liên hệ]&nbsp;</a>
 {% endif %}
 
 {% if page.converted %}
-	<a href="{{ page.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/vomanhtai/vomanhtai.github.io/master/_knitr/" }}" title="Rmd file" target="_blank">[code]</a>
+	<a href="{{ page.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/hochanh/rblog/master/_knitr/" }}" title="Rmd file" target="_blank">[code]</a>
 {% endif %}
 </p>
 </div>

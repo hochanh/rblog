@@ -1,0 +1,34 @@
+---
+---
+
+<!DOCTYPE html>
+<html class="no-js" lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="{{ site.description }}">
+  <meta name="google-site-verification" content="Aw5bqaMmnIV-BAwPy6lbNAR3nKZt4ILJL7vo5O3_uUk" />
+  <title>{% if page.title %}{{ page.title }} &mdash; {% endif %}{{ site.title }}</title>
+  <link href="assets/favicon.ico" rel="icon">
+  <link href="assets/style.css" media="screen, projection" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <div role="main" class="main">
+		<h1>[hochanh.github.io/rblog](http://hochanh.github.io/rblog)</h1>
+    <article>
+		{% for post in site.posts %}
+			<p>&raquo; 
+			<a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+			{% if post.converted %}
+				<span style="float: right"><a href="{{ post.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/hochanh/rblog/master/_knitr/" }}" title="Rmd file" target="_blank">[code]</a>
+				</span>
+			{% endif %}
+			</p>
+		{% endfor %}
+		</article>
+  </div>
+</body>
+
+{% include footer %}
+{% include ga %}
+</html>

@@ -7,7 +7,7 @@ Trang này là chỗ tôi dùng để chứa những thứ nhặt nhạnh đư�
 
 Xem [cách làm blog này](../r-markdown-kramdown-jekyll/).
 
-Xem [mã nguồn blog](http://github.com/vomanhtai/vomanhtai.github.io).
+Xem [mã nguồn blog](http://github.com/hochanh/rblog).
 
 
 ```r
