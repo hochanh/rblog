@@ -1,7 +1,7 @@
-vomanhtai.github.io
-===
+[rblog]
+=======
 
 
 Đây là mã nguồn trang [MạnhTài.vn](http://xn--mnhti-uqa9244c.vn).
 
-Địa chỉ gốc [vomanhtai.github.io](http://vomanhtai.github.io).
+Địa chỉ gốc [hochanh.github.io/rblog](http://hochanh.github.io/rblog).
