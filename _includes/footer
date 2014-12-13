@@ -2,7 +2,7 @@
 <p>
 {% if page.title %}
 	<a href="../">[quay lại]</a>&nbsp;
-	<span style="float: left">
+	<span style="float: right">
 	<a href="../contact" title="contact">[liên hệ]
 	</span>
 {% else %}
