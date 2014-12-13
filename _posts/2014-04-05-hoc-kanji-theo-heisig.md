@@ -54,3 +54,6 @@ Các nguồn tư liệu trên thì chỉ có sách là tốn phí. Tất nhiên 
 Mỗi ngày học 5, 10, 20, 30,... từ tùy vào bản thân bạn, nhưng để có thể thành công với phương pháp này (hay bất cứ phương pháp học nào mình biết) bắt buộc bạn phải thật sự chuyên cần.
 
 Chúc các bạn học hành vui vẻ!
+
+
+*Cập nhật:* [Remembering the Kanji: Offline stories](../remembering-the-kanji-offline-stories).

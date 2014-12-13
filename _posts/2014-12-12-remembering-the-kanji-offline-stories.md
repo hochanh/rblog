@@ -9,4 +9,6 @@ Offline stories: [rtk-koohii](http://github.com/hochanh/rtk-koohii). Demo: [hoch
 
 Offline strokes: [rtk-jisho](http://github.com/hochanh/rtk-jisho). Demo: [hochanh.github.io/rtk-jisho](http://hochanh.github.io/rtk-jisho).
 
-Chỉ mục của 2 thứ trên là V4 (i.e. 4th edition).
+`clone` và `jekyll serve` để dùng.
+
+Chỉ mục của 2 thứ trên đều theo RTK1 V4 (i.e. Remembering the Kanji: Volume I, 4th edition).
