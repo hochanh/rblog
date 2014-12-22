@@ -18,4 +18,4 @@ Chỉ mục của 2 thứ trên đều theo RTK1 V4 (i.e. Remembering the Kanji:
 
 ## Stories and Strokes!
 
-Nguồn: [github.com/manhtai/rtk](http://github.com/manhtai/rtk). Demo: [manhtai.github.io/rtk](http://manhtai.github.io/rtk)
+Nguồn: [github.com/hochanh/rtk](http://github.com/hochanh/rtk). Demo: [hochanh.github.io/rtk](http://hochanh.github.io/rtk)
