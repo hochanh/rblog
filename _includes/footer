@@ -5,8 +5,6 @@
 	<span style="float: right">
 	<a href="../contact" title="contact">[liên hệ]
 	</span>
-{% else %}
-	<a href="./about" title="about">[giới thiệu]</a>&nbsp;
 {% endif %}
 
 {% if page.converted %}
