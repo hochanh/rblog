@@ -10,5 +10,9 @@
 {% include math %}
 {% endif %}
 
+{% if page.comment != false %}
+{% include disqus %}
+{% endif %}
+
 {% include ga %}
 </html>
