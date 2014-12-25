@@ -18,4 +18,9 @@ Chỉ mục của 2 thứ trên đều theo RTK1 V4 (i.e. Remembering the Kanji:
 
 ## Stories and Strokes!
 
-Nguồn: [github.com/hochanh/rtk](http://github.com/hochanh/rtk). Demo: [hochanh.github.io/rtk](http://hochanh.github.io/rtk)
+Nguồn: [github.com/hochanh/rtk](http://github.com/hochanh/rtk). Demo: [hochanh.github.io/rtk](http://hochanh.github.io/rtk).
+
+
+## Anki: Top 5 koohii stories and Strokes!
+
+[Tải xuống](https://github.com/hochanh/rtk1v6-anki/blob/master/rtk1-v6.apkg?raw=true). Xem [nguồn](http://github.com/hochanh/rtk1v6-anki).
