@@ -6,9 +6,12 @@
 	<a href="../contact" title="contact">[liên hệ]
 	</span>
 {% endif %}
-
 {% if page.converted %}
 	<a href="{{ page.path | remove_first: '_posts/' | replace_first: '.md', '.Rmd' | prepend: "//raw.githubusercontent.com/hochanh/rblog/gh-pages/_knitr/" }}" title="Rmd file" target="_blank">[code]</a>
 {% endif %}
 </p>
+
+{% if page.comment != false %}
+{% include disqus %}
+{% endif %}
 </div>
