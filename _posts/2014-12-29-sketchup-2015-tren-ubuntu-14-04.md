@@ -17,7 +17,7 @@ sudo apt-get install wine1.7
 http://www.sketchup.com/download
 ~~~
 
-## Tải thư viện `mfc100u.dll`
+## Tải thư viện `mfc100u`
 
 - Tải tệp [tại đây](../files/mfc100u.dll).
 
