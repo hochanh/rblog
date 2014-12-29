@@ -17,13 +17,13 @@ sudo apt-get install wine1.7
 http://www.sketchup.com/download
 ~~~
 
-### Tải thư viện `mfc100u.dll`
+## Tải thư viện `mfc100u.dll`
 
 - Tải tệp [tại đây](../files/mfc100u.dll).
 
 - Copy vào `system32`.
 
-### Chạy SketchUp
+## Chạy SketchUp
 
 ~~~bash
 wine "C:\Program Files (x86)\SketchUp\SketchUp 2015\SketchUp.exe"
