@@ -7,7 +7,7 @@ comments: true
 share: true
 ---
 
-<figure><img src="http://3.bp.blogspot.com/-ECUSB9L_b5Y/U10XmaYjoqI/AAAAAAAAADM/0eLOQvEKRfY/s640/remembering+the+kanji.png"/></figure>
+<figure><img src="../images/rtk.png"/></figure>
 
 ## 1. Giới thiệu
 
