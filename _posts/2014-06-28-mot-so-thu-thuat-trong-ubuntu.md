@@ -62,3 +62,30 @@ sudo apt-get install modem-manager-gui
 Phương pháp này sử dụng được với D-com 3G loại E1750 và MF190S của Viettel.
 
 Dùng Modem Manager GUI cho phép thực hiện gửi tin nhắn và chạy USSD, tôi chưa tìm ra cách để sử dụng được tính năng gọi điện khi lắp sim bình thường vào D-com như trên Windows.
+
+### Xóa tự khởi động một số tiến trình
+
+#### cups
+
+```bash
+sudo geany /etc/init/cups.conf
+sudo geany /etc/init/cups-browsed.conf
+```
+
+#### bluetooth
+
+```bash
+sudo geany /etc/init/bluetooth.conf
+```
+
+#### apache2
+
+```bash
+update-rc.d -f apache2 remove
+```
+
+#### mysql
+
+```bash
+echo manual | sudo tee /etc/init/mysql.override
+```
