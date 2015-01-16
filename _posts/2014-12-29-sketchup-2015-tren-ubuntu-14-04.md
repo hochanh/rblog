@@ -19,7 +19,7 @@ http://www.sketchup.com/download
 
 ## Tải thư viện `mfc100u`
 
-- Tải tệp [tại đây](../files/mfc100u.dll).
+- Tải tệp [tại đây](http://raw.githubusercontent.com/hochanh/rblog/gh-pages/_knitr/files/mfc100u.dll).
 
 - Copy vào `system32`.
 

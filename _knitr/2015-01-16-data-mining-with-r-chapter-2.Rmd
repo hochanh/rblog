@@ -1,0 +1,601 @@
+---
+layout: post
+title: "Dự báo sự phát triển của tảo trên một số dòng sông ở Châu Âu"
+published: yes
+---
+
+## 1. Mô tả vấn đề và Mục tiêu cần đạt
+
+Sự tập trung cao độ của một số loài tảo độc trên các dòng sông là một vấn đề sinh thái học nghiêm trọng, không chỉ ảnh hưởng tới các thực thể sống trên sông mà còn ảnh hưởng tới chất lượng nguồn nước. Vì vậy tính chủ động trong việc theo dõi và thực hiện những dự báo sớm về sự phát triển của tảo là rất cần thiết trong việc nâng cao chất lượng các dòng sông.
+
+Để làm được điều này, các mẫu nước khác nhau đã được thu thập trên các dòng sông khác nhau ở châu Âu vào các thời điểm khác nhau trong khoảng thời gian xấp xỉ 1 năm. Với mỗi mẫu nước, người ta đo lường các thuộc tính hóa học khác nhau cũng như tần suất xuất hiện của 7 loại tảo độc. Một số thuộc tính khác của quá trình thu thập cũng đồng thời được ghi chép, chẳng hạn như mùa trong năm, kích thước dòng sông và tốc độ dòng chảy.
+
+Lý do chính của việc lấy mẫu này dựa trên thực tế rằng các xét nghiệm hóa học thường có giá thành rẻ và dễ dàng tự động hóa, trong khi các phân tích sinh học để xác định loài tảo nào có mặt trong nước liên quan tới các xét nghiệm vi sinh, yêu cầu nhân lực chất lượng cao và do đó đòi hỏi chi phí và thời gian nhiều hơn. Do vậy, việc lập các mô hình có khả năng dự báo chính xác tần suất xuất hiện của các loài tảo dựa trên các thuộc tính hóa học sẽ đơn giản hóa việc tạo ra các hệ thống rẻ và tự động trong việc theo dõi sự sinh trưởng của các loài tảo độc.
+
+Một mục đích khác của nghiên cứu này là để cung cấp hiểu biết rõ ràng hơn về các yếu tố tác động tới tần suất xuất hiện của tảo. Nói cách khác, chúng tôi muốn hiểu được những tần suất này liên quan như thế nào tới các thuộc tính hóa học của các mẫu nước cũng như với các thuộc tính khác của mẫu như mùa trong năm, loại sông,...
+
+## 2. Mô tả dữ liệu
+
+Dữ liệu có sẵn cho nghiên cúu này được thu thập trên mạng nghiên cứu [ERUDIT](http://www.erudit.org/) và đã được sử dụng cho cuộc thi quốc tế về phân tích dữ liệu COIL năm 1999. Dữ liệu này có sẵn ở một vài nguồn, chẳng hạn như dữ liệu của [UCI](http://archive.ics.uci.edu/ml/).
+
+Có 2 bộ dữ liệu chính trong nghiên cứu này. Bộ đầu tiên bao gồm dữ liệu của 200 mẫu nước. Chính xác hơn, mỗi quan sát trong các bộ dữ liệu thực tế là tập hợp của một số mẫu nước được thu thập từ cùng 1 dòng sông trong khoảng thời gian 3 tháng, trong cùng một mùa trong năm.
+
+Mỗi quan sát chứa thông tin về 11 biến số. 3 trong số đó là biến danh nghĩa, mô tả mùa trong năm, kích cỡ và tốc độ dòng chảy của dòng sông. 8 biến còn lại là các giá trị của các tham số hóa học khác nhau đo lường được trong các mẫu nước, gồm:
+
+- Giá trị pH lớn nhất
+- Giá trị O<sub>2</sub> nhỏ nhất
+- Giá trị Cl trung bình
+- Giá trị trung bình của NO<sub>3</sub>-
+- Giá trị trung bình của NH<sub>4</sub>+
+- Giá trị trung bình của PO<sub>4</sub>3-
+- Giá trị trung bình của PO<sub>4</sub>
+- Giá trị trung bình của chlorophyll
+
+Đi kèm với mỗi tham số trên là tần số của 7 loài tảo độc khác nhau tìm thấy tương ứng trong mỗi mẫu nước. Không có thông tin nào về tên của loại tảo được tìm thấy.
+
+Bố dữ liệu thứ hai chứa thông tin về 140 quan sát bổ sung. Nó có cấu trúc tương tự bộ dữ liệu thứ nhất, tuy nhiên không bao gồm thông tin về tần suất xuất hiện của 7 loại tảo độc. Những quan sát bổ sung này có thể xem như một bộ kiểm thử. Mục tiêu chính của nghiên cứu này là dự đoán tần suất của 7 loại tảo cho 140 mẫu nước. Điều này có nghĩa chúng ta đang phải giải quyết một nhiệm vụ dự báo trong khai thác dữ liệu (Data Mining).
+
+## 3. Nạp dữ liệu vào R
+
+Có 2 cách để nạp dữ liệu cho nghiên cứu này: sử dụng thư viện `DMwR` hoặc tệp dữ liệu `Analysis.txt`.
+
+```{r load data}
+# Sử dụng thư viện có sẵn
+library(DMwR)
+head(algae)
+```
+
+```{r load2, eval=FALSE}
+# Nạp dữ liệu từ tệp Analysis.txt
+algae <- read.table('Analysis.txt',
+          header=F,
+          dec='.',
+          col.names=c('season','size','speed','mxPH','mnO2','Cl',
+          'NO3','NH4','oPO4','PO4','Chla','a1','a2','a3','a4',
+          'a5','a6','a7'),
+          na.strings=c('XXXXXXX'))
+
+```
+
+## 4. Tổng hợp và phác họa dữ liệu
+
+```{r histogram}
+# Sử dụng thư viện graphics
+summary(algae)
+hist(algae$mxPH, prob=T)
+
+# Sử dụng thư viện ggvis
+# Tương tác
+library(ggvis)
+algae %>%
+  ggvis(~mxPH) %>%
+  layer_histograms(width=input_slider(0.1,2,1))
+
+# Không tương tác
+algae %>%
+  ggvis(~mxPH) %>%
+  layer_densities(density_args = list(na.rm = T))
+
+# Sử dụng qqplot của thư viện car
+library(car)
+par(mfrow=c(1,2))
+hist(algae$mxPH, prob=T, xlab='',
+      main='Histogram of maximum pH value',ylim=0:1)
+lines(density(algae$mxPH,na.rm=T))
+rug(jitter(algae$mxPH))
+qqPlot(algae$mxPH,main='Normal QQ plot of maximum pH')
+par(mfrow=c(1,1))
+
+# Sử dụng thư viện ggplot2
+library(ggplot2)
+library(gridExtra)
+plot1 <- ggplot(algae, aes(mxPH)) + 
+  geom_histogram(binwidth=0.5, aes(y=..density..), fill="white", color="black") + 
+  geom_density(alpha=0.2) + 
+  geom_rug()
+plot2 <- ggplot(algae, aes(sample = mxPH)) + stat_qq()
+grid.arrange(plot1, plot2, ncol=2)
+```
+
+```{r boxplot}
+# Sử dụng thư viện graphics
+boxplot(algae$oPO4,ylab='Orthophosphate (oPO4)')
+rug(jitter(algae$oPO4),side=2)
+abline(h=mean(algae$oPO4,na.rm=T),lty=2)
+
+# Sử dụng thư viện ggplot2
+ggplot(algae, aes(x = factor(0), y = oPO4)) + 
+  geom_boxplot(varwidth=T) + xlab("") + 
+  geom_rug() + 
+  geom_abline(intercept=mean(algae$oPO4,na.rm=T), linetype=2)
+```
+
+```{r scatterplot}
+# Sử dụng thư viện graphic
+plot(algae$NH4,xlab='')
+abline(h=mean(algae$NH4,na.rm=T),lty=1)
+abline(h=mean(algae$NH4,na.rm=T)+sd(algae$NH4,na.rm=T),lty=2)
+abline(h=median(algae$NH4,na.rm=T),lty=3)
+identify(algae$NH4)
+
+
+plot(algae$NH4,xlab='')
+clicked.lines <- identify(algae$NH4)
+algae[clicked.lines,]
+
+algae[algae$NH4 > 19000,]
+
+# Sử dụng thư viện ggplot2
+ggplot(algae, aes(y=NH4,x=seq_along(NH4))) + geom_point()
+
+# Sử dụng thư viện ggvis
+all_values <- function(x) {
+  if(is.null(x)) return(NULL)
+  paste0(names(x), ": ", format(x), collapse = "<br />")
+}
+algae %>%
+  ggvis(x=~seq_along(NH4), y = ~NH4) %>%
+  layer_points() %>%
+  add_tooltip(all_values, "hover")
+```
+
+```{r conditional}
+# Sử dụng thư viện lattice
+library(lattice)
+print(bwplot(size ~ a1, data=algae,ylab='River Size',xlab='Algal A1'))
+
+# Sử dụng ggplot2
+ggplot(algae) + 
+  geom_boxplot(aes(y = a1, x = size)) + 
+  ylab("Algal A1") + xlab("River Size") +
+  coord_flip()
+
+# Sử dụng Hmisc
+library(Hmisc)
+print(bwplot(size ~ a1, data=algae, panel=panel.bpplot, 
+        probs=seq(.01,.49,by=.01), datadensity=TRUE,
+        ylab='River Size',xlab='Algal A1'))
+
+# Sử dụng ggplot2
+ggplot(algae) +
+  geom_violin(aes(y = a1, x = size)) + 
+  ylab("Algal A1") + xlab("River Size") +
+  coord_flip()
+  
+# Sử dụng lattice
+minO2 <- equal.count(na.omit(algae$mnO2),
+                     number=4,overlap=1/5)
+stripplot(season ~ a3|minO2,
+          data=algae[!is.na(algae$mnO2),])
+
+# Sử dụng ggplot2
+qplot(a3, mnO2, data=algae) + facet_grid(season ~ .)
+```
+
+## 5. Giá trị không xác định
+
+Khi gặp các bộ dữ liệu có chứa các giá trị không xác định chúng ta có thể giải quyết theo một trong các hướng sau:
+
+- Loại bỏ các trường hợp có chứa các giá trị chưa biết
+- Tính các giá trị chưa biết bằng cách tìm mối tương quan giữa các biến
+- Tính các giá trị chưa biết bằng cách tìm sự tương tự giữa các biến
+- Sử dụng công cụ có khả năng xử lý được các giá trị này
+
+### Loại bỏ các trường hợp chứa các giá trị không xác định
+
+```{r remove, eval=FALSE}
+library(DMwR)
+data(algae)
+
+algae[!complete.cases(algae),]
+
+
+nrow(algae[!complete.cases(algae),])
+
+
+algae <- na.omit(algae)
+
+
+algae <- algae[-c(62,199),]
+
+
+apply(algae,1,function(x) sum(is.na(x)))
+
+
+data(algae)
+manyNAs(algae,0.2)
+
+
+algae <- algae[-manyNAs(algae),]
+```
+
+### Thay các giá trị chưa biết bằng trung bình, trung vị, hoặc mốt
+
+```{r fill with most freq, eval=FALSE}
+# Trung bình
+algae[48,'mxPH'] <- mean(algae$mxPH,na.rm=T)
+
+# Trung vị
+algae[is.na(algae$Chla),'Chla'] <- median(algae$Chla,na.rm=T)
+
+# Trung vị & mốt
+data(algae)
+algae <- algae[-manyNAs(algae),]
+algae <- centralImputation(algae)
+```
+
+### Thay các giá trị chưa biết bằng tìm mối tương quan
+
+```{r fill by cor, eval=FALSE}
+# Tìm hệ số tương quan
+cor(algae[,4:18],use="complete.obs")
+
+# Ma trận tương quan
+symnum(cor(algae[,4:18],use="complete.obs"))
+
+# Xét riêng PO4 và oPO4
+data(algae)
+algae <- algae[-manyNAs(algae),]
+lm(PO4 ~ oPO4,data=algae)
+
+# Thay thế
+algae[28,'PO4'] <- 42.897 + 1.293 * algae[28,'oPO4']
+
+# Thay thế đồng loạt
+data(algae)
+algae <- algae[-manyNAs(algae),]
+fillPO4 <- function(oP) {
+   if (is.na(oP)) return(NA)
+   else return(42.897 + 1.293 * oP)
+}
+algae[is.na(algae$PO4),'PO4'] <- 
+    sapply(algae[is.na(algae$PO4),'oPO4'],fillPO4)
+```
+
+Tìm mối tương quan giữa các biến chứa các đại lượng chưa biến và các biến danh nghĩa
+
+```{r hist}
+# Sử dụng lattice
+histogram(~ mxPH | season,data=algae)
+
+# ggplto2
+ggplot(algae) +
+  geom_histogram(aes(x=mxPH, y=..density..), binwidth=0.4, color="white") +
+  facet_grid(. ~ season)
+```
+
+```{r convert}
+# Chuyển sang lớp factor
+algae$season <- factor(algae$season,levels=c('spring','summer','autumn','winter'))
+```
+
+```{r hist2}
+# lattice
+histogram(~ mxPH | size*speed,data=algae)
+
+# ggplot2
+ggplot(algae) +
+  geom_histogram(aes(x=mxPH, y=..density..), binwidth=0.4, color="white") +
+  facet_grid(size ~ speed)
+
+# lattice
+stripplot(size ~ mxPH | speed, data=algae, jitter=T)
+
+#ggplot2
+ggplot(algae) +
+  geom_point(aes(x=mxPH, y=seq_along(mxPH)), binwidth=0.4, size=3) +
+  facet_grid(size ~ speed)
+```
+
+### Thay thế các giá trị chưa biết bằng cách tìm sự tương tự giữa các biến
+
+```{r fill by similar, eval=FALSE}
+data(algae)
+algae <- algae[-manyNAs(algae),]
+
+# Hàng xóm gần nhất trung bình có trọng số
+algae <- knnImputation(algae,k=10)
+
+# Phương pháp trung vị
+algae <- knnImputation(algae,k=10,meth='median')
+```
+
+## 6. Xây dựng mô hình dự đoán
+
+Trong nghiên cứu này chúng tôi sẽ áp dụng 2 mô hình dự đoán khác nhau có thể áp dụng cho các nghiên cứu về tảo: hồi quy tuyến tính đa biến và cây hồi quy. Lựa chọn này là do mục đích trình diễn trong khuôn khổ cuốn sách và chưa phải là kết quả của một bước lựa chọn mô hình tiêu chuẩn.
+
+### Hồi quy tuyến tính đa biến
+
+```{r multiple}
+# Loại bỏ các giá trị chưa biết
+data(algae)
+algae <- algae[-manyNAs(algae), ]
+clean.algae <- knnImputation(algae, k = 10)
+
+# Chạy mô hình cho 1 biến
+lm.a1 <- lm(a1 ~ ., data=clean.algae[,1:12])
+
+# Các thông số của mô hình
+summary(lm.a1)
+
+# Phân tích phương sai để loại bỏ dần các biến
+anova(lm.a1)
+
+# Loại bỏ biến season ra khỏi mô hình 1
+lm2.a1 <- update(lm.a1, . ~ . - season)
+
+# Các thông số của mô hình 2
+summary(lm2.a1)
+
+# So sánh 2 mô hình
+anova(lm.a1,lm2.a1)
+
+# Sử dụng hàm step để lặp lại việc đơn giản hóa mô hình
+# sử dụng AIC (Akaike Information Criterion)
+final.lm <- step(lm.a1)
+
+# Thông số của mô hình cuối
+summary(final.lm)
+```
+
+Tỉ lệ phương sai giải thích bằng mô hình tuyến tính trên đây vẫn chưa đáng kể, chứng tỏ mô hình tuyến tính không phù hợp với phân tích sự phát triển của tảo.
+
+### Cây hồi quy
+
+```{r regression tree}
+# Phân tích sử dụng thư viện rpart
+library(rpart)
+data(algae)
+algae <- algae[-manyNAs(algae), ]
+rt.a1 <- rpart(a1 ~ ., data=algae[,1:12])
+
+# Xem cây dạng chữ
+rt.a1
+
+# # Xem cây dạng đồ thị
+# prettyTree(rt.a1)
+
+## Xem thông số của mô hình 
+# sumarry(rt.a1)
+```
+
+Hàm `rpart()` phát triển cây hồi quy cho đến khi đạt được các tiêu chuẩn:
+
+- Mức giảm độ lệch nhỏ hơn một mức tiêu chuẩn (`cp`)
+- Số lượng mẫu trong một nút nhỏ hơn một mức tiêu chuẩn (`minsplit`)
+- Độ sâu của cây vượt quá một mức tiêu chuẩn (`maxdepth`)
+
+Mặc định giá trị của chúng lần lượt là 0.01, 20 và 30.
+
+```{r pruning}
+# Xem tham số phức tạp của mô hình (cp)
+printcp(rt.a1)
+# # Đồ thị
+# plotcp(rt.a1)
+
+# Chọn mô hình có xerror + xstd nhỏ nhất
+rt2.a1 <- prune(rt.a1,cp=0.08)
+rt2.a1
+
+# Chọn tự động
+set.seed(1234) # Just to ensure  same results as in the book
+(rt.a1 <- rpartXse(a1 ~ .,data=algae[,1:12]))
+
+# Tạo một phiên bản cắt của cây hồi quy
+# sử dụng hàm snip.part()
+first.tree <- rpart(a1 ~ .,data=algae[,1:12])
+snip.rpart(first.tree,c(4,7))
+
+
+# # Sử dụng hàm snip.part() trên đồ thị
+# prettyTree(first.tree)
+# snip.rpart(first.tree)
+```
+
+## 7. Đánh giá và lựa chọn mô hình
+
+Hiệu suất dự báo của các mô hình hồi quy được thực hiện bằng cách so sánh các giá trị dự đoán của mô hình với các giá trị thực tế và tính toán một số trung bình về sai số từ so sánh này. Một trong các số trung bình đó là sai số trung bình tuyệt đối (MAE - the mean absolute error).
+
+```{r mae}
+# Dự báo bằng mô hình
+lm.predictions.a1 <- predict(final.lm,clean.algae)
+rt.predictions.a1 <- predict(rt.a1,algae)
+
+# Tính toán sai số trung bình tuyệt đối
+(mae.a1.lm <- mean(abs(lm.predictions.a1-algae[,'a1'])))
+(mae.a1.rt <- mean(abs(rt.predictions.a1-algae[,'a1'])))
+```
+
+Một số trung bình khác là sai số bình phương trung bình (MSE - the mean squared error).
+
+```{r mse}
+(mse.a1.lm <- mean((lm.predictions.a1-algae[,'a1'])^2))
+(mse.a1.rt <- mean((rt.predictions.a1-algae[,'a1'])^2))
+```
+
+Sai số bình phương trung bình chuẩn hóa (NMSE - the nỏmalized mean squared error)
+
+```{r nmse}
+(nmse.a1.lm <- mean((lm.predictions.a1-algae[,'a1'])^2)/
+                mean((mean(algae[,'a1'])-algae[,'a1'])^2))
+(nmse.a1.rt <- mean((rt.predictions.a1-algae[,'a1'])^2)/
+                mean((mean(algae[,'a1'])-algae[,'a1'])^2))
+```
+
+Tính 3 số trung bình cùng lúc
+
+```{r 3 average}
+regr.eval(algae[,'a1'],lm.predictions.a1,train.y=algae[,'a1'])
+regr.eval(algae[,'a1'],rt.predictions.a1,train.y=algae[,'a1'])
+```
+
+Biểu diễn sai số lên đồ thị
+
+```{r error graph, eval=FALSE}
+old.par <- par(mfrow=c(1,2))
+plot(lm.predictions.a1,algae[,'a1'],main="Linear Model",
+     xlab="Predictions",ylab="True Values")
+abline(0,1,lty=2)
+plot(rt.predictions.a1,algae[,'a1'],main="Regression Tree",
+     xlab="Predictions",ylab="True Values")
+abline(0,1,lty=2)
+par(old.par)
+```
+
+Đồ thị tương tác
+
+```{r, eval=FALSE}
+plot(lm.predictions.a1,algae[,'a1'],main="Linear Model",
+     xlab="Predictions",ylab="True Values")
+abline(0,1,lty=2)
+algae[identify(lm.predictions.a1,algae[,'a1']),]
+```
+
+Loại bỏ các dự báo âm (-) trong mô hình tuyến tính
+
+```{r remove neg}
+sensible.lm.predictions.a1 <- ifelse(lm.predictions.a1 < 0,0,lm.predictions.a1)
+regr.eval(algae[,'a1'],lm.predictions.a1,stats=c('mae','mse'))
+regr.eval(algae[,'a1'],sensible.lm.predictions.a1,stats=c('mae','mse'))
+```
+
+
+Nói chung, khi giải quyết các vấn đề dự báo, chúng ta cần phải đưa ra quyết định về:
+
+- Lựa chọn mô hình thay thế cho vấn đề dự báo đang giải quyết
+- Lựa chọn tiêu chí đánh giá sử dụng để đánh giá mô hình
+- Lựa chọn phương pháp thực nghiệm để có được các ước tính hợp lý cho các tiêu chí này
+
+Hàm `experimentalComparison()` cung cấp một giải pháp để thực hiện công đoạn này.
+
+```{r experimentalComparison, eval=FALSE}
+cv.rpart <- function(form,train,test,...) {
+  m <- rpartXse(form,train,...)
+  p <- predict(m,test)
+  mse <- mean((p-resp(form,test))^2)
+  c(nmse=mse/mean((mean(resp(form,train))-resp(form,test))^2))
+}
+cv.lm <- function(form,train,test,...) {
+  m <- lm(form,train,...)
+  p <- predict(m,test)
+  p <- ifelse(p < 0,0,p)
+  mse <- mean((p-resp(form,test))^2)
+  c(nmse=mse/mean((mean(resp(form,train))-resp(form,test))^2))
+}
+
+res <- experimentalComparison(
+            c(dataset(a1 ~ .,clean.algae[,1:12],'a1')),
+            c(variants('cv.lm'), 
+              variants('cv.rpart',se=c(0,0.5,1))),
+            cvSettings(3,10,1234))
+
+
+summary(res)
+
+
+plot(res)
+
+
+getVariant('cv.rpart.v1',res)
+```
+
+Sử dụng `experimentalComparison()` cho 7 biến cùng lúc
+
+```{r experimentalComparison2, eval=FALSE}
+
+DSs <- sapply(names(clean.algae)[12:18],
+         function(x,names.attrs) { 
+           f <- as.formula(paste(x,"~ ."))
+           dataset(f,clean.algae[,c(names.attrs,x)],x) 
+         },
+         names(clean.algae)[1:11])
+
+res.all <- experimentalComparison(
+                  DSs,
+                  c(variants('cv.lm'),
+                    variants('cv.rpart',se=c(0,0.5,1))
+                   ),
+                  cvSettings(5,10,1234))
+
+
+plot(res.all)
+
+
+bestScores(res.all)
+```
+
+Sử dụng `randomForest()` cho `experimentalComparison()`
+
+```{r randomF, eval=FALSE}
+library(randomForest)
+cv.rf <- function(form,train,test,...) {
+  m <- randomForest(form,train,...)
+  p <- predict(m,test)
+  mse <- mean((p-resp(form,test))^2)
+  c(nmse=mse/mean((mean(resp(form,train))-resp(form,test))^2))
+}
+res.all <- experimentalComparison(
+                  DSs,
+                  c(variants('cv.lm'),
+                    variants('cv.rpart',se=c(0,0.5,1)),
+                    variants('cv.rf',ntree=c(200,500,700))
+                   ),
+                  cvSettings(5,10,1234))
+
+
+bestScores(res.all)
+
+
+compAnalysis(res.all,against='cv.rf.v3',
+               datasets=c('a1','a2','a4','a6'))
+```
+
+## 8. Dự báo cho 7 loại tảo
+
+Trong phần này chúng tôi sẽ chỉ ra cách để dự báo sự phát triển của 7 loại tảo trong 140 mẫu thử. Phân Đánh giá và lựa chọn mô hình ở trên đã cho thấy cách thức chọn mô hình dự báo tốt nhất bằng cách sử dụng ước tính sai số trung bình bình phương chuẩn hóa (NMSE) cho một nhóm các mô hình trong cả 7 nhiệm vụ dự báo, trên cơ sở quá trình kiểm tra chéo (CV - cross-validation).
+
+Mục tiêu chính của nghiên cứu này là thu được 7 dự báo cho 140 quan sát trong bộ dữ liệu kiểm thử. Mỗi một dự báo sẽ được tính ra từ mô hình mà quá trình kiểm tra chéo đã chỉ ra là tốt nhất. Đó là những mô hình thu được từ việc chạy hàm `bestScores()`.
+
+```{r prediction, eval=FALSE}
+bestModelsNames <- sapply(bestScores(res.all),
+                          function(x) x['nmse','system'])
+learners <- c(rf='randomForest',rpart='rpartXse') 
+funcs <- learners[sapply(strsplit(bestModelsNames,'\\.'),
+                        function(x) x[2])]
+parSetts <- lapply(bestModelsNames,
+                   function(x) getVariant(x,res.all)@pars)
+
+bestModels <- list()
+for(a in 1:7) {
+  form <- as.formula(paste(names(clean.algae)[11+a],'~ .'))
+  bestModels[[a]] <- do.call(funcs[a],
+          c(list(form,clean.algae[,c(1:11,11+a)]),parSetts[[a]]))
+}
+
+# Thay thế các giá trị chưa biết trong bộ dữ liệu kiểm thử
+# bằng knn
+clean.test.algae <- knnImputation(test.algae,k=10,distData=algae[,1:11])
+
+
+preds <- matrix(ncol=7,nrow=140)
+for(i in 1:nrow(clean.test.algae)) 
+  preds[i,] <- sapply(1:7,
+                      function(x) 
+                        predict(bestModels[[x]],clean.test.algae[i,])
+                     )
+
+
+avg.preds <- apply(algae[,12:18],2,mean)
+apply( ((algae.sols-preds)^2),           2,mean) / 
+apply( (scale(algae.sols,avg.preds,F)^2),2,mean)
+```
+
+Những báo cáo khoa học của những nhóm thắng cuộc tại cuộc thi COIL năm 1999.
+
+- [Bontempi, G., Birattari, M., and Bersini, H. (1999). Lazy learners at work: The lazy learning toolbox. In Proceedings of the 7th European Congress on Intelligent Tecnhiques & Soft Computing (EUFIT’99)](http://raw.githubusercontent.com/hochanh/rblog/gh-pages/_knitr/files/EUFIT-BonBirBer1999eufit.pdf).
+
+- [Chan, R. (1999). Protecting rivers & streams by monitoring chemical concentrations and algae communities. In Proceedings of the 7th European Congress on Intelligent Tecnhiques & Soft Computing (EUFIT’99)](http://raw.githubusercontent.com/hochanh/rblog/gh-pages/_knitr/files/EUFIT-10.1.1.131.4618-libre.pdf).
+
+- [Devogelaere, D., Rijckaert, M., and Embrechts, M. J. (1999). 3rd international competition: Protecting rivers and streams by monitoring chemical concentrations and algae communities solved with the use of gadc. In Proceedings of the 7th European Congress on Intelligent Tecnhiques & Soft Computing (EUFIT’99)](http://raw.githubusercontent.com/hochanh/rblog/gh-pages/_knitr/files/EUFIT-supervised.pdf).
+
+- [Torgo, L. (1999b). Predicting the density of algae communities using local regression trees. In Proceedings of the 7th European Congress on Intelligent Tecnhiques & Soft Computing (EUFIT’99)](http://raw.githubusercontent.com/hochanh/rblog/gh-pages/_knitr/files/EUFIT-PDACLRT.pdf).
