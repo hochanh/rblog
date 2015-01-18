@@ -33,3 +33,4 @@
 2014-11-23-cap-nhat-jekyll-it.Rmd
 2014-11-26-napoleon-march-in-r.Rmd
 2015-01-16-data-mining-with-r-chapter-2.Rmd
+2015-01-18-data-mining-with-r-chapter-4.Rmd
