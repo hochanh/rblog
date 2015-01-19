@@ -197,7 +197,7 @@ sales[noVal,'Val'] <- sales[noVal,'Quant'] *
 sales$Uprice <- sales$Val/sales$Quant
 
 # Lưu lại, nhở?
-save(sales,file='Datasets/C4/salesClean.Rdata')
+# save(sales,file='salesClean.Rdata')
 ```
 
 #### 2.2.2 Những sản phẩm có ít giao dịch
@@ -232,7 +232,7 @@ points(log(ms[smalls,1]),log(ms[smalls,2]),pch='+')
 
 Kiểm định Kolmogorov-Smirnov dùng để kiểm tra 2 mẫu có cùng một phân phối hay không. Chúng ta tìm kiếm trong những giao dịch có trung vị và khoảng tứ phân vị giống nhau nhất.
 
-```{r formal test}
+```{r formal test, warning=FALSE}
 # Chuẩn hóa dữ liệu ms
 dms <- scale(ms)
 smalls <- which(table(Prod) < 20)
@@ -269,8 +269,8 @@ nrow(similar[similar[,'ks.p'] >= 0.9,])
 # hoặc
 sum(similar[,'ks.p'] >= 0.9)
 
-# Lưu lại, nhở
-save(similar,file='Datasets/C4/similarProducts.Rdata')
+# Lưu lại
+# save(similar,file='similarProducts.Rdata')
 ```
 
 ## 3. Xác định nhiệm vụ khai thác dữ liệu
@@ -302,13 +302,13 @@ Giả sử chúng ta có 7 trường hợp kiểm thử với các giá trị _{
 
 Trên cơ sở đó ta lập được ma trận tương đương như sau:
 
-||||**Predictions**|
-|||| ok | fraud |
-|:---|:---:|:---:|:---|
-|**True**| ok  | 3   | 1   |
-|**values**| fraud   | 2   | 1   |
+|          |         |**Predictions**  |
+|          |         | ok  |fraud|
+|:---------|:-------:|:---:|:---:|:---:|
+|**True**  | ok      | 3   | 1   | 4   |
+|**values**| fraud   | 2   | 1   | 3   |
 |=====
-||| 5 | 2 | 7 |
+|          |         | 5   | 2   | 7   |
 {: rules="groups"}
 
 Mức chính xác và Mức gọi lại:
@@ -369,7 +369,7 @@ Các sản phẩm khác nhau sẽ có một mức co giãn khác nhau về mức
 
 Mã R như sau:
 
-```{r normalize dist}
+```{r normalize dist, eval=FALSE}
 avgNDTP <- function(toInsp,train,stats) {
   if (missing(train) && missing(stats)) 
     stop('Provide either the training data or the product stats')
@@ -402,7 +402,7 @@ Một vấn đề nữa trong tình huống này là sự thiên lệch giữa p
 
 Hàm `holdOut()` cho phép thực hiện thực nghiệm giữ lại một phần. Một trong các tham số của hàm này có chữa những thiết đặt cho việc chạy thực nghiệm, bao gồm cả việc chọn mẫu phân tầng. Trong phần tới chúng tôi sẽ đưa ra vài ví dụ cho việc sử dụng hàm này để ước tính những thông số thống kê được lựa chọn, gồm mức chính xác, mức gọi lại, và khoảng cách trung bình tới mức giá tiêu chuẩn. Những thông số đó được tính bởi hàm sau:
 
-```{r eval outlier ranking}
+```{r eval outlier ranking, eval=FALSE}
 evalOutlierRanking <- function(testSet,rankOrder,Threshold,statsProds) {
   ordTS <- testSet[rankOrder,]
   N <- nrow(testSet)
@@ -427,7 +427,7 @@ Trong phần này chúng tôi sẽ xây dựng các mô hình khác nhau để t
 
 Mã R như sau:
 
-```{r box plox rule modified}
+```{r box plox rule modified, eval=FALSE}
 BPrule <- function(train,test) {
   notF <- which(train$Insp != 'fraud')
   ms <- tapply(train$Uprice[notF],list(Prod=train$Prod[notF]),
@@ -449,7 +449,7 @@ Chúng ta sẽ đánh giá phương pháp này sử dụng phương pháp thực
 
 Bắt đầu bằng việc tính trung vị và khoảng tứ vị cho từng sản phẩm để tính khoảng chuẩn hóa trung bình.
 
-```{r global stat}
+```{r global stat, eval=FALSE}
 notF <- which(sales$Insp != 'fraud')
 globalStats <- tapply(sales$Uprice[notF],
                       list(Prod=sales$Prod[notF]),
@@ -466,7 +466,7 @@ globalStats[which(globalStats[,'iqr']==0),'iqr'] <-
 
 Hàm sau trả về các thông số thống kê được tính từ hàm `evalOutlierRanking()` và sẽ được gọi từ hàm `holdOut()`: (Chạy mô hình BPrule)
 
-```{r eval bprm}
+```{r eval bpr, eval=FALSE}
 ho.BPrule <- function(form, train, test, ...) {
   res <- BPrule(train,test)
   structure(evalOutlierRanking(test,res$rankOrder,...),
@@ -479,7 +479,7 @@ ho.BPrule <- function(form, train, test, ...) {
 
 Thực hiện đánh giá mô hình bằng cách gọi hàm `holdOut()`
 
-```{r bp.res}
+```{r bp.res, eval=FALSE}
 bp.res <- holdOut(learner('ho.BPrule',
                           pars=list(Threshold=0.1,
                                     statsProds=globalStats)),
@@ -515,7 +515,7 @@ Hàm `lofactor()` được phát triển dựa trên thuật toán LOF.
 
 Chạy mô hình LOF dựa trên hàm `lofactor()`:
 
-```{r ho.lof}
+```{r ho.lof, eval=FALSE}
 ho.LOF <- function(form, train, test, k, ...) {
   require(dprep,quietly=T)
   ntr <- nrow(train)
@@ -755,7 +755,7 @@ Sử dụng `naiveBayes()` kết hợp `SMOTE()`:
 
 Chạy mô hình
 
-```{r nbs}
+```{r nbs, eval=FALSE}
 nb.s <- function(train,test) {
   require(e1071,quietly=T)
   sup <- which(train$Insp != 'unkn')
@@ -772,7 +772,7 @@ nb.s <- function(train,test) {
 
 Đánh giá mô hình:
 
-```{r nbs eval}
+```{r nbs eval, eval=FALSE}
 ho.nbs <- function(form, train, test, ...) {
   res <- nb.s(train,test)
   structure(evalOutlierRanking(test,res$rankOrder,...),
@@ -919,7 +919,7 @@ legend('bottomright',c('NaiveBayes','ORh','AdaBoostM1'),
 
 Kết quả thu được bằng phương pháp này tỏ ra là phương pháp tốt nhất cho tới hiện tại.
 
-{% highlight r %}
+{% highlight text %}
 == Summary of a Hold Out Experiment ==
 
  Stratified  3 x 70 %/ 30 % Holdout run with seed =  1234 

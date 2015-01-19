@@ -5,8 +5,8 @@ jekyll_it <- function(dir=getwd(), images.dir=dir, images.url='',
   files <- list.files(path=dir, pattern=in_ext, 
                      ignore.case=TRUE, recursive=FALSE)
   # Check if files converted then not scan
-  if (file.exists("knitr.F")) {
-    files2 <- readLines("knitr.F")
+  if (file.exists("knitr.txt")) {
+    files2 <- readLines("knitr.txt")
     for (fil in files2) message(paste("Not scan ", fil, sep=''))
     files <- setdiff(files, files2)
   }
@@ -49,8 +49,8 @@ jekyll_it <- function(dir=getwd(), images.dir=dir, images.url='',
       }
     } 
   }
-  # Write converted files to knitr.F
-  if (!is.null(setdiff(files, files2))) writeLines(files2, "knitr.F")
+  # Write converted files to knitr.txt
+  if (!is.null(setdiff(files, files2))) writeLines(files2, "knitr.txt")
   invisible()
 }
 jekyll_it()
