@@ -16,4 +16,17 @@ Có từ 2006. Giờ mới biết :x:
 *   [Naive Bayes](http://en.wikipedia.org/wiki/Naive_Bayes_classifier)
 *   [CART](http://en.wikipedia.org/wiki/Predictive_analytics#Classification_and_regression_trees)
 
+Trong R:
 
+*   **C4.5**: `RWeka::J48()`
+*   **k-Means**: `stats::kmeans()`
+*   **SVM**: `e1071::svm()`
+*   **Apriori**: `RWeka::Apiori()`
+*   **Expectation-Maximization**: `mixtools::normalmixEM()`, 
+*   **PageRank**: ``
+*   **AdaBoost**: `RWeka::AadBoostM1()`
+*   **kNN**: `class::knn()`, `FNN::knn()`, `caret::knn3()`
+*   **Naive Bayes**: `e1071::naiveBayes()`
+*   **CART**: `rpart::rpart()`
+
+_Tiếp tục cập nhật..._
