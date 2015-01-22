@@ -8,7 +8,7 @@ share: true
 ---
 
 
-Tôi mới cài đặt Ubuntu 14.04 LTS để thay thế cho bản Windows 8.1 có bản quyền đàng hoàng của mình vì tôi đã dùng R, dùng git, chả nhẽ giờ lại xài Windows? Hehe.
+Tôi mới cài đặt Ubuntu 14.04 LTS để thay thế cho bản Windows 8.1 có bản quyền đàng hoàng của mình :alien:
 
 <figure><img src="/images/ubuntu14.04.png" />
 <figcaption>Ubuntu 14.04</figcaption>
