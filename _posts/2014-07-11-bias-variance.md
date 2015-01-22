@@ -17,7 +17,7 @@ $$Bias(\hat{f}(x_0))=E(\hat{f}(x_0)-y_0)$$
  
 là Bias (sai lệch) giữa $\hat{f}$ và $f$.
  
-Nôm na, Bias là sai lệch giữa mô hình và thực tế còn Variance là phương sai của mô hình, hay chính xác hơn là chênh lệch giữa kết quả áp dụng 1 mô hình đối với các mẫu đầu vào khác nhau.
+Nôm na, Bias là sai lệch giữa mô hình và thực tế còn Variance là phương sai của mô hình, hay chính xác hơn là chênh lệch giữa kết quả áp dụng 1 mô hình đối với các mẫu đầu vào khác nhau (bằng cách sử dụng phương pháp xác nhận chéo, cross-validation, chẳng hạn).
  
 Sai lệch tổng cộng bằng phương sai của mô hình và bình phương chênh lệch giữa mô hình và thực tế, hay:
  
