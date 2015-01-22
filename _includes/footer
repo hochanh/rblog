@@ -1,9 +1,14 @@
 <div id="foot">
 <p>
 {% if page.title %}
-	<a href="../">[quay lại]</a>&nbsp;
+	<a href="../">[trang chủ]</a>&nbsp;
 	<span style="float: right">
 	<a href="../contact" title="contact">[liên hệ]
+	</span>
+{% else %}
+	<a href="../about">[giới thiệu]</a>&nbsp;
+	<span style="float: right">
+	<a href="http://github.com/hochanh/rblog" title="contact">[mã nguồn]
 	</span>
 {% endif %}
 {% if page.converted %}

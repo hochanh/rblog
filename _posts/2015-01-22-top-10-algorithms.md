@@ -24,9 +24,10 @@ Trong R:
 *   **Apriori**: `RWeka::Apiori()`
 *   **Expectation-Maximization**: `mixtools::normalmixEM()`, 
 *   **PageRank**: ``
-*   **AdaBoost**: `RWeka::AadBoostM1()`
+*   **AdaBoost**: `RWeka::AdaBoostM1()`
 *   **kNN**: `class::knn()`, `FNN::knn()`, `caret::knn3()`
 *   **Naive Bayes**: `e1071::naiveBayes()`
 *   **CART**: `rpart::rpart()`
 
-_Tiếp tục cập nhật..._
+
+#### _Tiếp tục cập nhật..._
