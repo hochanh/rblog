@@ -3,10 +3,16 @@ layout: post
 title: "Shiny apps: Lexicon Xác suất thống kê và Học máy"
 ---
 
+## Xem trên web:
+
+https://manhtai.shinyapps.io/lexicon/
+
+## Xem trong R:
+
 ```r
 library(shiny)
 runGitHub("hochanh/lexicon")
 # runApp() nếu đã tải về
 ```
 
-Nguồn: [github.com/hochanh/lexicon](http://github.com/hochanh/lexicon)
+_Nguồn:_ [github.com/hochanh/lexicon](http://github.com/hochanh/lexicon)
