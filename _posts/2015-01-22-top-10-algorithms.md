@@ -25,7 +25,7 @@ Trong R:
 *   **Expectation-Maximization**: `mixtools::normalmixEM()`, 
 *   **PageRank**: ``
 *   **AdaBoost**: `RWeka::AdaBoostM1()`
-*   **kNN**: `class::knn()`, `FNN::knn()`, `caret::knn3()`
+*   **kNN**: `class::knn()`, `FNN::knn()`, `caret::knn3()`, `MASS::knn()`, `ipred::ipredknn()`
 *   **Naive Bayes**: `e1071::naiveBayes()`
 *   **CART**: `rpart::rpart()`
 
