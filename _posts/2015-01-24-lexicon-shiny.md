@@ -11,7 +11,7 @@ https://manhtai.shinyapps.io/lexicon/
 
 ```r
 library(shiny)
-runGitHub("hochanh/lexicon")
+runGitHub("statvn/lexicon")
 # runApp() nếu đã tải về
 ```
 
