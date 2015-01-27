@@ -19,7 +19,6 @@ share: true
 
 ### Tiếng Việt:
 
-* Sách “Phân tích dữ liệu và biểu đồ bằng R” của Nguyễn Văn Tuấn (Nxb Khoa học Kĩ thuật 2005). Cuốn này tôi đã có ebook cả bản rút gọn và bản (gần) đầy đủ. Bạn nào cần xin <a href="{{ site.url }}/contact/">liên hệ</a>
+* Sách “Phân tích dữ liệu và biểu đồ bằng R” của Nguyễn Văn Tuấn (Nxb Khoa học Kĩ thuật 2005). [Tải xuống](https://docsend.com/view/ktsgnuj).
 * Các bài giảng về ngôn ngữ R của Nguyễn Văn Tuấn trên <a href="https://www.youtube.com/playlist?list=PLbRKZL7ww3qigINHAitlUFxzp72a0nfdl" rel="nofollow" target="_blank">Youtube</a>
-* Theo dõi blog này thường xuyên! :D
 
