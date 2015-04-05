@@ -5,8 +5,8 @@ title: "Shiny apps: Lexicon Xác suất thống kê và Học máy"
 
 ```r
 library(shiny)
-runGitHub("khdl/lexicon")
+runGitHub("hochanh/lexicon")
 # runApp() nếu đã tải về
 ```
 
-_Nguồn:_ [github.com/khdl/lexicon](http://github.com/khdl/lexicon)
+_Nguồn:_ [github.com/hochanh/lexicon](http://github.com/hochanh/lexicon)
