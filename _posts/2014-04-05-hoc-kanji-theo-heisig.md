@@ -56,4 +56,4 @@ Mỗi ngày học 5, 10, 20, 30,... từ tùy vào bản thân bạn, nhưng đ�
 Chúc các bạn học hành vui vẻ!
 
 
-*Cập nhật:* [Remembering the Kanji: Offline stories](../remembering-the-kanji-offline-stories).
+*Cập nhật:* Tìm hán tự theo từ khóa, xem thứ tự nét, gói offline cho Anki: [Remembering the Kanji: Offline stories](../remembering-the-kanji-offline-stories).
