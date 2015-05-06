@@ -3,24 +3,14 @@ layout: post
 title: "Remembering the Kanji: Offline Stories"
 ---
 
-## Stories or Strokes?
-
 Từ bài đăng [này](../hoc-kanji-theo-heisig).
 
-Offline stories: [rtk-koohii](http://github.com/hochanh/rtk-koohii). Demo: [hochanh.github.io/rtk-koohii](http://hochanh.github.io/rtk-koohii).
+*Cập nhật:*
 
-Offline strokes: [rtk-jisho](http://github.com/hochanh/rtk-jisho). Demo: [hochanh.github.io/rtk-jisho](http://hochanh.github.io/rtk-jisho).
+## Tìm hán tự theo từ khóa:
 
-`clone` và `jekyll serve` để dùng.
+[Rtk-search](http://manhtai.github.io/rtk). Xem [nguồn](http://github.com/manhtai/rtk).
 
-Chỉ mục của 2 thứ trên đều theo RTK1 V4 (i.e. Remembering the Kanji: Volume I, 4th edition).
-
-
-## Stories and Strokes!
-
-Nguồn: [github.com/hochanh/rtk](http://github.com/hochanh/rtk). Demo: [hochanh.github.io/rtk](http://hochanh.github.io/rtk).
-
-
-## Anki: Top 5 koohii stories and Strokes!
+## Dành cho Anki: 
 
 [Tải xuống](https://github.com/hochanh/rtk1v6-anki/blob/master/rtk1-v6.apkg?raw=true). Xem [nguồn](http://github.com/hochanh/rtk1v6-anki).
