@@ -9,7 +9,7 @@ Từ bài đăng [này](../hoc-kanji-theo-heisig).
 
 ## Tìm hán tự theo từ khóa:
 
-[Rtk-search](http://manhtai.github.io/rtk). Xem [nguồn](http://github.com/manhtai/rtk).
+[Rtk-search](http://hochanh.github.io/rtk). Xem [nguồn](http://github.com/hochanh/rtk).
 
 ## Dành cho Anki: 
 
